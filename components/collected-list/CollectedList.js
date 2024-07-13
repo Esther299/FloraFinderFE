@@ -82,7 +82,7 @@ export default function CollectedList({ navigation }) {
         <View style={styles.overlay} />
         <View style={styles.activity_indicator_background}>
           <ActivityIndicator size="large" color="#006400" />
-          <Text>Fetching plants...</Text>
+          <Text>Loading plants...</Text>
         </View>
       </ImageBackground>
     );
@@ -200,18 +200,18 @@ const styles = StyleSheet.create({
     margin: 5,
   },
   icon_button: {
-    marginTop: 20,
+    marginTop: 30,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+    padding: 10,
     backgroundColor: "#006400",
     borderRadius: 5,
   },
   reset_button: {
-    marginTop: 20,
+    marginTop: 30,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+    padding: 10,
     backgroundColor: "#8B0000",
     borderRadius: 5,
   },

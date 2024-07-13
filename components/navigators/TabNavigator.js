@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useContext } from "react";
+import { StyleSheet } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -12,11 +13,11 @@ import CollectedList from "../collected-list/CollectedList";
 import CollectedSingleCard from "../collected-list/CollectedSingleCard";
 import CollectedMap from "../CollectedMap";
 import CollectNow from "../CollectNow";
-import LeagueTable from "../LeagueTable";
+import LeagueTable from "../LeagueTable/LeagueTable";
 import HomePage from "../HomePage";
 import PlantResult from "../PlantResult";
 import ProfilePage from "../ProfilePage";
-import UserCard from "../UserCard";
+import UserCard from "../LeagueTable/UserCard";
 
 import { UserContext } from "../../contexts/Contexts";
 
@@ -28,9 +29,15 @@ export function TabNavigator() {
 
   if (user.username) {
     return (
-      
       <Tab.Navigator
-        screenOptions={{ headerShown: false, tabBarActiveTintColor: "green" }}
+        screenOptions={{
+          headerShown: false,
+          tabBarActiveTintColor: "green",
+          tabBarInactiveTintColor: "gray",
+          tabBarStyle: styles.tabBar,
+          tabBarLabelStyle: styles.tabBarLabel,
+          tabBarIconStyle: styles.tabBarIcon,
+        }}
       >
         <Tab.Screen
           name="HomeTab"
@@ -40,12 +47,14 @@ export function TabNavigator() {
             tabBarIcon: () => <FontAwesomeIcon icon={faHome} color={"green"} />,
           }}
         />
-          <Tab.Screen
+        <Tab.Screen
           name="CollectTab"
           component={CollectNowStack}
           options={{
             tabBarLabel: "Collect Now",
-            tabBarIcon: () => <FontAwesomeIcon icon={faCamera} color={"green"} />,
+            tabBarIcon: () => (
+              <FontAwesomeIcon icon={faCamera} color={"green"} />
+            ),
           }}
         />
         <Tab.Screen
@@ -110,3 +119,33 @@ const CollectedListStack = () => (
     <Stack.Screen name="Profile" component={ProfilePage} />
   </Stack.Navigator>
 );
+
+const styles = StyleSheet.create({
+  tabBar: {
+    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderTopColor: "#e0e0e0",
+    paddingBottom: 5,
+    paddingTop: 5,
+    height: 60,
+  },
+  tabBarLabel: {
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  tabBarIcon: {
+    marginBottom: -3,
+  },
+  stackNavigator: {
+    headerStyle: {
+      backgroundColor: "#006400",
+    },
+    headerTintColor: "#fff",
+    headerTitleStyle: {
+      fontWeight: "bold",
+    },
+  },
+  stackScreen: {
+    headerShown: false,
+  },
+});

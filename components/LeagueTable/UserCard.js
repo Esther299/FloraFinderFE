@@ -7,9 +7,9 @@ import {
   Image,
   ImageBackground,
 } from "react-native";
-import { getUserByUsername, getUsers } from "../api/apiFunctions";
+import { getUserByUsername, getUsers } from "../../api/apiFunctions";
 
-const backgroundLeaf = require("../assets/backgroundtest.jpg");
+const backgroundLeaf = require("../../assets/backgroundtest.jpg");
 
 const UserCard = ({ route }) => {
   const { username } = route.params;
@@ -75,8 +75,9 @@ const UserCard = ({ route }) => {
         <View style={styles.card}>
           <View style={styles.avatarContainer}>
             <Image
-              source={{ uri: user.avatar || "https://via.placeholder.com/150" }}
+              source={{ uri: user.avatar }}
               style={styles.avatar}
+              resizeMode="contain"
             />
           </View>
           <View style={styles.infoContainer}>
