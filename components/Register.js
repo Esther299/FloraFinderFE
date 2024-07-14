@@ -1,345 +1,285 @@
 import * as React from "react";
 import {
     TextInput,
-    SafeAreaView,
     StyleSheet,
+    Platform,
     Pressable,
     Text,
     View,
-    Button,
     Alert,
     Image,
     ScrollView,
     ImageBackground,
 } from "react-native";
-import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import { postNewUser } from "../api/apiFunctions";
 
 const backgroundLeaf = require("../assets/backgroundtest.jpg");
 const logo = require("../assets/FloraFinderLogo.png");
 
+const validationSchema = yup.object().shape({
+  emailAddress: yup
+    .string()
+    .email("Invalid email address")
+    .required("Email Address is required"),
+  password: yup
+    .string()
+    .min(5, "Password must be at least 5 characters")
+    .max(20, "Password must be no more than 20 characters")
+    .matches(/\w/, "Password must contain only letters, digits, or underscores")
+    .required("Password is required"),
+  username: yup
+    .string()
+    .max(20, "Username must be no more than 20 characters")
+    .required("Username is required"),
+  firstName: yup
+    .string()
+    .max(100, "First Name must be no more than 100 characters")
+    .required("First Name is required"),
+  lastName: yup
+    .string()
+    .max(100, "Last Name must be no more than 100 characters")
+    .required("Last Name is required"),
+});
+
 export default function Register({ navigation }) {
-    const {
-        control,
-        handleSubmit,
-        formState: { errors },
-    } = useForm({
-        defaultValues: {
-            emailAddress: "",
-            password: "",
-            username: "",
-            firstName: "",
-            lastName: "",
-        },
-    });
-    const onSubmit = (data) => {
-        console.log(data, "data");
-        const newUser = {
-            username: data.username,
-            name: data.firstName + " " + data.lastName,
-            email: data.emailAddress,
-            password: data.password,
-        };
-        console.log(newUser);
-        postNewUser(newUser)
-            .then((user) => {
-                Alert.alert(
-                    "Registration complete!",
-                    "Please login to your account.",
-                    [
-                        {
-                            text: "Login",
-                            onPress: () => navigation.navigate("Login"),
-                            style: "default",
-                        },
-                    ]
-                );
-            })
-            .catch((error) => {
-                console.log(error);
-                Alert.alert("Registration Failed!", `${error}`);
-            });
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      emailAddress: "",
+      password: "",
+      username: "",
+      firstName: "",
+      lastName: "",
+    },
+  });
+  const onSubmit = (data) => {
+    console.log(data, "data");
+    const newUser = {
+      username: data.username,
+      name: data.firstName + " " + data.lastName,
+      email: data.emailAddress,
+      password: data.password,
     };
-    return (
-        <ScrollView
-            contentContainerStyle={styles.background}
-            showsVerticalScrollIndicator={false}
-        >
-            <ImageBackground
-                source={backgroundLeaf}
-                style={styles.backgroundImage}
-                resizeMode="stretch"
-            >
-                <View style={styles.overlay}></View>
-                <View style={styles.container}>
-                    <View style={styles.logoContainer}>
-                        <Image source={logo} style={styles.logo} />
-                    </View>
-                    <Text style={styles.heading}>Register</Text>
+    console.log(newUser);
+    postNewUser(newUser)
+      .then((user) => {
+        Alert.alert("Registration complete!", "Please login to your account.", [
+          {
+            text: "Login",
+            onPress: () => navigation.navigate("Login"),
+            style: "default",
+          },
+        ]);
+      })
+      .catch((error) => {
+        console.log(error);
+        Alert.alert("Registration Failed!", `${error}`);
+      });
+  };
+  return (
+    <ScrollView
+      contentContainerStyle={styles.background}
+      showsVerticalScrollIndicator={false}
+    >
+      <ImageBackground
+        source={backgroundLeaf}
+        style={styles.backgroundImage}
+        resizeMode="stretch"
+      >
+        <View style={styles.overlay}></View>
+        <View style={styles.container}>
+          <View style={styles.logoContainer}>
+            <Image source={logo} style={styles.logo} />
+          </View>
+          <Text style={styles.heading}>Register</Text>
 
-                    <Text style={styles.labelContainerText}>
-                        Enter your email address:
-                    </Text>
-                    <Controller
-                        control={control}
-                        rules={{
-                            required: true,
-                            pattern:
-                                /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                        }}
-                        render={({ field: { onChange, onBlur, value } }) => (
-                            <TextInput
-                                placeholder="Email Address"
-                                onBlur={onBlur}
-                                onChangeText={onChange}
-                                value={value}
-                                style={styles.textInput}
-                            />
-                        )}
-                        name="emailAddress"
-                    />
+          <Text style={styles.labelContainerText}>
+            Enter your email address:
+          </Text>
+          <Controller
+            control={control}
+            name="emailAddress"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                placeholder="Email Address"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                style={styles.textInput}
+              />
+            )}
+          />
+          {errors.emailAddress && (
+            <Text style={styles.errorText}>{errors.emailAddress.message}</Text>
+          )}
 
-                    {errors.emailAddress?.type === "pattern" && (
-                        <Text style={styles.errorText}>
-                            Invalid Email Address.
-                        </Text>
-                    )}
-                    {errors.emailAddress?.type === "required" && (
-                        <Text style={styles.errorText}>
-                            Email Address is required.
-                        </Text>
-                    )}
+          <Text style={styles.labelContainerText}>Create a password:</Text>
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                secureTextEntry={true}
+                placeholder="Password"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                style={styles.textInput}
+              />
+            )}
+          />
+          {errors.password && (
+            <Text style={styles.errorText}>{errors.password.message}</Text>
+          )}
 
-                    <Text style={styles.labelContainerText}>
-                        Create a password:
-                    </Text>
+          <Text style={styles.labelContainerText}>Enter a username:</Text>
+          <Controller
+            control={control}
+            name="username"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                placeholder="Username"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                style={styles.textInput}
+              />
+            )}
+          />
+          {errors.username && (
+            <Text style={styles.errorText}>{errors.username.message}</Text>
+          )}
 
-                    <Controller
-                        control={control}
-                        rules={{
-                            maxLength: 20,
-                            minLength: 5,
-                            required: true,
-                            pattern: /\w/,
-                        }}
-                        render={({ field: { onChange, onBlur, value } }) => (
-                            <TextInput
-                                secureTextEntry={true}
-                                placeholder="Password"
-                                onBlur={onBlur}
-                                onChangeText={onChange}
-                                value={value}
-                                style={styles.textInput}
-                            />
-                        )}
-                        name="password"
-                    />
+          <Text style={styles.labelContainerText}>Enter your first name:</Text>
+          <Controller
+            control={control}
+            name="firstName"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                placeholder="First Name"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                style={styles.textInput}
+              />
+            )}
+          />
+          {errors.firstName && (
+            <Text style={styles.errorText}>{errors.firstName.message}</Text>
+          )}
 
-                    {errors.password?.type === "required" && (
-                        <Text style={styles.errorText}>
-                            Password is required.{" "}
-                        </Text>
-                    )}
-                    {errors.password?.type === "minLength" && (
-                        <Text style={styles.errorText}>
-                            Password must be 5 or more characters.{" "}
-                        </Text>
-                    )}
-                    {errors.password?.type === "maxLength" && (
-                        <Text style={styles.errorText}>
-                            Password must be no more than 20 characters.{" "}
-                        </Text>
-                    )}
-                    {errors.password?.type === "pattern" && (
-                        <Text style={styles.errorText}>
-                            Password must contain only letters, digits or.{" "}
-                        </Text>
-                    )}
-                    <Text style={styles.labelContainerText}>
-                        Enter a username:
-                    </Text>
-                    <Controller
-                        control={control}
-                        rules={{
-                            maxLength: 20,
-                            required: true,
-                        }}
-                        render={({ field: { onChange, onBlur, value } }) => (
-                            <TextInput
-                                placeholder="Username"
-                                onBlur={onBlur}
-                                onChangeText={onChange}
-                                value={value}
-                                style={styles.textInput}
-                            />
-                        )}
-                        name="username"
-                    />
+          <Text style={styles.labelContainerText}>Enter your last name:</Text>
+          <Controller
+            control={control}
+            name="lastName"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                placeholder="Last Name"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                style={styles.textInput}
+              />
+            )}
+          />
+          {errors.lastName && (
+            <Text style={styles.errorText}>{errors.lastName.message}</Text>
+          )}
 
-                    {errors.username?.type === "required" && (
-                        <Text style={styles.errorText}>This is required.</Text>
-                    )}
-                    {errors.username?.type === "maxLength" && (
-                        <Text style={styles.errorText}>
-                            No more than 20 characters.
-                        </Text>
-                    )}
-                    <Text style={styles.labelContainerText}>
-                        Enter your first name:
-                    </Text>
-
-                    <Controller
-                        control={control}
-                        rules={{
-                            maxLength: 100,
-                            required: true,
-                        }}
-                        render={({ field: { onChange, onBlur, value } }) => (
-                            <TextInput
-                                placeholder="First Name"
-                                onBlur={onBlur}
-                                onChangeText={onChange}
-                                value={value}
-                                style={styles.textInput}
-                            />
-                        )}
-                        name="firstName"
-                    />
-                    {errors.firstName && (
-                        <Text style={styles.errorText}>This is required.</Text>
-                    )}
-
-                    <Text style={styles.labelContainerText}>
-                        Enter your last name:
-                    </Text>
-
-                    <Controller
-                        control={control}
-                        rules={{
-                            maxLength: 100,
-                            required: true,
-                        }}
-                        render={({ field: { onChange, onBlur, value } }) => (
-                            <TextInput
-                                placeholder="Last Name"
-                                onBlur={onBlur}
-                                onChangeText={onChange}
-                                value={value}
-                                style={styles.textInput}
-                            />
-                        )}
-                        name="lastName"
-                    />
-                    {errors.lastName && (
-                        <Text style={styles.errorText}>This is required.</Text>
-                    )}
-
-                    <Pressable
-                        style={styles.button}
-                        title="Submit"
-                        onPress={handleSubmit(onSubmit)}
-                    >
-                        <Text style={styles.buttonText}>Create An Account</Text>
-                    </Pressable>
-                </View>
-            </ImageBackground>
-        </ScrollView>
-    );
+          <Pressable
+            style={styles.button}
+            title="Submit"
+            onPress={handleSubmit(onSubmit)}
+          >
+            <Text style={styles.buttonText}>Create An Account</Text>
+          </Pressable>
+        </View>
+      </ImageBackground>
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({
-    // container: {
-    //     flex: 1,
-    //     backgroundColor: "#CCFFCC",
-    //     alignItems: "center",
-    //     justifyContent: "center",
-    // },
-    button: {
-        alignItems: "center",
-        justifyContent: "center",
-        paddingVertical: 12,
-        paddingHorizontal: 32,
-        borderRadius: 4,
-        elevation: 3,
-        backgroundColor: "#006400",
-        width: "50%",
-        margin: 12,
+  scrollViewContainer: {
+    flexGrow: 1,
+  },
+  backgroundImage: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  logoContainer: {
+    marginBottom: 20,
+  },
+  logo: {
+    width: 100,
+    height: 100,
+    resizeMode: "contain",
+  },
+  heading: {
+    fontSize: 24,
+    color: "white",
+    marginBottom: 20,
+    fontWeight: Platform.OS === "ios" ? "600" : "bold",
+  },
+  labelContainerText: {
+    color: "white",
+    alignSelf: "flex-start",
+    marginBottom: 5,
+  },
+  textInput: {
+    width: "100%",
+    padding: Platform.OS === "ios" ? 15 : 10,
+    backgroundColor: "white",
+    borderRadius: 5,
+    marginBottom: 10,
+    fontSize: Platform.OS === "ios" ? 16 : 14,
+  },
+  errorText: {
+    color: "red",
+    alignSelf: "flex-start",
+    marginBottom: 10,
+  },
+  button: {
+    marginTop: 20,
+    backgroundColor: "green",
+    padding: 15,
+    borderRadius: 5,
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
     },
-    backgroundImage: {
-        flexGrow: 1,
-        width: "100%",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    logoContainer: {
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        alignItems: "center",
-    },
-
-    overlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: "rgba(255, 255, 255, 0.8)",
-    },
-    container: {
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-        paddingTop: 20,
-    },
-
-    button: {
-        alignItems: "center",
-        justifyContent: "center",
-        paddingVertical: 12,
-        paddingHorizontal: 32,
-        borderRadius: 4,
-        elevation: 3,
-        backgroundColor: "#006400",
-        width: "50%", // percentages need to be in quotes
-        margin: 12,
-    },
-    heading: {
-        color: "#006400",
-        marginBottom: 10,
-        fontFamily: "Inter_900Black",
-        fontSize: 25,
-        paddingTop: 150,
-    },
-    textInput: {
-        backgroundColor: "white",
-        height: 40,
-        width: 250,
-        borderWidth: 2,
-        borderRadius: 5,
-        borderStyle: "solid",
-        borderColor: "#006400",
-        marginVertical: 10,
-        paddingHorizontal: 10,
-    },
-    buttonText: {
-        color: "white",
-    },
-    errorText: {
-        color: "red",
-    },
-    labelContainerText: {
-        // backgroundColor: "white",
-        // borderWidth: 2,
-        // borderRadius: 5,
-        // borderStyle: "solid",
-        // borderColor: "#006400",
-        // padding: 5,
-        fontWeight: "bold",
-        alignSelf: "flex-start",
-        marginTop: 10,
-        marginBottom: -4,
-    },
-    logo: {
-        height: 250,
-        resizeMode: "contain",
-    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
+  },
 });
