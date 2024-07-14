@@ -1,17 +1,16 @@
 import React, { useEffect, useState, useContext } from "react";
 import {
-    StyleSheet,
-    Text,
-    View,
-    ImageBackground,
-    Image,
-    TouchableOpacity,
-    Alert,
-    Pressable,
-    ActivityIndicator,
-    ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  ImageBackground,
+  Image,
+  Alert,
+  Pressable,
+  ActivityIndicator,
+  ScrollView,
+  Platform,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import { getUserByUsername, deleteUser } from "../api/apiFunctions";
 import { UserContext } from "../contexts/Contexts";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -19,129 +18,122 @@ import { faUserXmark, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 const backgroundLeaf = require("../assets/backgroundtest.jpg");
 
 export default function ProfilePage() {
-    const { user, setUser } = useContext(UserContext);
-    const { err, setErr } = useContext(UserContext);
-    const [isLoading, setIsLoading] = useState(true);
-    const navigation = useNavigation();
+  const { user, setUser } = useContext(UserContext);
+  const { err, setErr } = useContext(UserContext);
+  const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        getUserByUsername(user.username)
-            .then((fetchedUser) => {
-                setUser(fetchedUser);
-                setIsLoading(false);
-            })
-            .catch((error) => {
-                console.error("Error fetching profile", error);
-                Alert.alert(
-                    err.status,
-                    err.msg,
-                    "Failed to load profile. Please try again."
-                );
-                setIsLoading(false);
-            });
-    }, [user.username]);
-    const handleDeleteUser = () => {
+  useEffect(() => {
+    getUserByUsername(user.username)
+      .then((fetchedUser) => {
+        setUser(fetchedUser);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching profile", error);
         Alert.alert(
-            "Delete Account",
-            `Are you sure you want to delete your account, ${user.username}?`,
-            [
-                {
-                    text: "Cancel",
-                    style: "cancel",
-                },
-                {
-                    text: "OK",
-                    onPress: () => {
-                        deleteUser(user.username)
-                            .then(() => {
-                                setUser({});
-                                //   navigation.navigate("LoginRegister");
-                            })
-                            .catch((error) => {
-                                console.error("Error deleting user:", error);
-                                Alert.alert(
-                                    err.status,
-                                    err.msg,
-                                    "Failed to delete user. Please try again."
-                                );
-                            });
-                    },
-                },
-            ]
+          err.status,
+          err.msg,
+          "Failed to load profile. Please try again."
         );
-    };
-    const handleLogout = () => {
-        setUser({});
-        // navigation.navigate("LoginRegister");
-    };
+        setIsLoading(false);
+      });
+  }, [user.username]);
+  const handleDeleteUser = () => {
+    Alert.alert(
+      "Delete Account",
+      `Are you sure you want to delete your account, ${user.username}?`,
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "OK",
+          onPress: () => {
+            deleteUser(user.username)
+              .then(() => {
+                setUser({});
+              })
+              .catch((error) => {
+                console.error("Error deleting user:", error);
+                Alert.alert(
+                  err.status,
+                  err.msg,
+                  "Failed to delete user. Please try again."
+                );
+              });
+          },
+        },
+      ]
+    );
+  };
+  const handleLogout = () => {
+    setUser({});
+  };
 
-    if (isLoading) {
-        return (
-            <ImageBackground
-                source={backgroundLeaf}
-                style={styles.imageBackground}
-                resizeMode="cover"
-            >
-                <View style={styles.overlay} />
-                <View style={styles.activity_indicator_background}>
-                    <ActivityIndicator size="large" color="#006400" />
-                    <Text>Loading...</Text>
-                </View>
-            </ImageBackground>
-        );
-    }
-
+  if (isLoading) {
     return (
       <ImageBackground
         source={backgroundLeaf}
         style={styles.imageBackground}
         resizeMode="cover"
       >
-        <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-          <Text style={styles.heading}>My Profile</Text>
-          {user ? (
-            <View style={styles.profileCard}>
-              {user.avatar ? (
-                <View style={styles.avatarContainer}>
-                  <Image
-                    source={{ uri: user.avatar }}
-                    style={styles.avatar}
-                    resizeMode="contain"
-                  />
-                  <Text style={styles.avatarLabel}>Avatar</Text>
-                </View>
-              ) : (
-                <Text>No avatar available!</Text>
-              )}
-              <View style={styles.userInfo}>
-                <Text style={styles.label}>Username:</Text>
-                <Text style={styles.value}>{user.username}</Text>
-                <Text style={styles.label}>Email:</Text>
-                <Text style={styles.value}>{user.email}</Text>
-                <Text style={styles.label}>Name:</Text>
-                <Text style={styles.value}>{user.name}</Text>
-                <Text style={styles.label}>Total Score:</Text>
-                <Text style={styles.value}>{user.total_score}</Text>
-              </View>
-              <Pressable style={styles.logoutButton} onPress={handleLogout}>
-                <Text style={styles.logoutButtonText}>Logout</Text>
-                <FontAwesomeIcon
-                  icon={faSignOutAlt}
-                  color={"white"}
-                  size={25}
-                />
-              </Pressable>
-              <Pressable style={styles.deleteButton} onPress={handleDeleteUser}>
-                <Text style={styles.deleteButtonText}>Delete Account</Text>
-                <FontAwesomeIcon icon={faUserXmark} color={"white"} size={25} />
-              </Pressable>
-            </View>
-          ) : (
-            <Text>Loading...</Text>
-          )}
-        </ScrollView>
+        <View style={styles.overlay} />
+        <View style={styles.activity_indicator_background}>
+          <ActivityIndicator size="large" color="#006400" />
+          <Text>Loading...</Text>
+        </View>
       </ImageBackground>
     );
+  }
+
+  return (
+    <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+      <ImageBackground
+        source={backgroundLeaf}
+        style={styles.imageBackground}
+        resizeMode="cover"
+      >
+        <Text style={styles.heading}>My Profile</Text>
+        {user ? (
+          <View style={styles.profileCard}>
+            {user.avatar ? (
+              <View style={styles.avatarContainer}>
+                <Image
+                  source={{ uri: user.avatar }}
+                  style={styles.avatar}
+                  resizeMode="contain"
+                />
+                <Text style={styles.avatarLabel}>Avatar</Text>
+              </View>
+            ) : (
+              <Text>No avatar available!</Text>
+            )}
+            <View style={styles.userInfo}>
+              <Text style={styles.label}>Username:</Text>
+              <Text style={styles.value}>{user.username}</Text>
+              <Text style={styles.label}>Email:</Text>
+              <Text style={styles.value}>{user.email}</Text>
+              <Text style={styles.label}>Name:</Text>
+              <Text style={styles.value}>{user.name}</Text>
+              <Text style={styles.label}>Total Score:</Text>
+              <Text style={styles.value}>{user.total_score}</Text>
+            </View>
+            <Pressable style={styles.logoutButton} onPress={handleLogout}>
+              <Text style={styles.logoutButtonText}>Logout</Text>
+              <FontAwesomeIcon icon={faSignOutAlt} color={"white"} size={25} />
+            </Pressable>
+            <Pressable style={styles.deleteButton} onPress={handleDeleteUser}>
+              <Text style={styles.deleteButtonText}>Delete Account</Text>
+              <FontAwesomeIcon icon={faUserXmark} color={"white"} size={25} />
+            </Pressable>
+          </View>
+        ) : (
+          <Text>Loading...</Text>
+        )}
+      </ImageBackground>
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({

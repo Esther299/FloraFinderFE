@@ -6,6 +6,7 @@ import {
   Pressable,
   ActivityIndicator,
   ImageBackground,
+  Platform,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useContext, useEffect, useState } from "react";
@@ -80,26 +81,26 @@ export default function CollectedList({ navigation }) {
         resizeMode="cover"
       >
         <View style={styles.overlay} />
-        <View style={styles.activity_indicator_background}>
+        <View style={styles.activityIndicatorBackground}>
           <ActivityIndicator size="large" color="#006400" />
-          <Text>Loading plants...</Text>
+          <Text style={styles.loadingText}>Loading plants...</Text>
         </View>
       </ImageBackground>
     );
   }
 
   return (
-    <ImageBackground
-      source={backgroundLeaf}
-      style={styles.background}
-      resizeMode="repeat"
-    >
-      <View style={styles.overlay}></View>
-      <View style={styles.container}>
-        <ScrollView style={styles.scrollView}>
-          <View style={styles.query_container}>
-            <View style={styles.query_row}>
-              <View style={styles.query_button_container}>
+    <ScrollView style={styles.scrollView}>
+      <ImageBackground
+        source={backgroundLeaf}
+        style={styles.background}
+        resizeMode="repeat"
+      >
+        <View style={styles.overlay}></View>
+        <View style={styles.container}>
+          <View style={styles.queryContainer}>
+            <View style={styles.queryRow}>
+              <View style={styles.queryButtonContainer}>
                 <RNPickerSelect
                   onValueChange={(value) => setSelectedSpeciesFamily(value)}
                   items={speciesFamilies.map((family) => ({
@@ -108,9 +109,9 @@ export default function CollectedList({ navigation }) {
                   }))}
                   placeholder={{ label: "Family", value: null }}
                   style={pickerSelectStyles}
-                ></RNPickerSelect>
+                />
               </View>
-              <View style={styles.query_button_container}>
+              <View style={styles.queryButtonContainer}>
                 <RNPickerSelect
                   onValueChange={(value) => setSortBy(value)}
                   items={[
@@ -120,13 +121,13 @@ export default function CollectedList({ navigation }) {
                   ]}
                   placeholder={{ label: "Sort", value: null }}
                   style={pickerSelectStyles}
-                ></RNPickerSelect>
+                />
               </View>
             </View>
 
-            <View style={styles.query_button_container}>
+            <View style={styles.queryButtonContainer}>
               <Pressable
-                style={styles.icon_button}
+                style={styles.iconButton}
                 onPress={() => setOrderBy(orderBy === "ASC" ? "DESC" : "ASC")}
               >
                 <Ionicons
@@ -136,9 +137,9 @@ export default function CollectedList({ navigation }) {
                 />
               </Pressable>
             </View>
-            <View style={styles.query_button_container}>
-              <Pressable style={styles.reset_button} onPress={handleReset}>
-                <Text style={styles.button_text}>Reset</Text>
+            <View style={styles.queryButtonContainer}>
+              <Pressable style={styles.resetButton} onPress={handleReset}>
+                <Text style={styles.buttonText}>Reset</Text>
               </Pressable>
             </View>
           </View>
@@ -156,11 +157,12 @@ export default function CollectedList({ navigation }) {
               <CollectedListCard plant={plant} />
             </Pressable>
           ))}
-        </ScrollView>
-      </View>
-    </ImageBackground>
+        </View>
+      </ImageBackground>
+    </ScrollView>
   );
 }
+
 const styles = StyleSheet.create({
   imageBackground: {
     flex: 1,
@@ -178,10 +180,15 @@ const styles = StyleSheet.create({
     bottom: 0,
     backgroundColor: "rgba(0,0,0,0.5)",
   },
-  activity_indicator_background: {
+  activityIndicatorBackground: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 10,
+    color: "white",
+    fontSize: 16,
   },
   container: {
     flex: 1,
@@ -190,16 +197,20 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  query_container: {
+  queryContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 10,
   },
-  query_button_container: {
+  queryRow: {
+    flexDirection: "row",
+    flex: 3,
+  },
+  queryButtonContainer: {
     flex: 1,
     margin: 5,
   },
-  icon_button: {
+  iconButton: {
     marginTop: 30,
     justifyContent: "center",
     alignItems: "center",
@@ -207,7 +218,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#006400",
     borderRadius: 5,
   },
-  reset_button: {
+  resetButton: {
     marginTop: 30,
     justifyContent: "center",
     alignItems: "center",
@@ -215,7 +226,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#8B0000",
     borderRadius: 5,
   },
-  button_text: {
+  buttonText: {
     color: "white",
     fontWeight: "bold",
   },
@@ -242,7 +253,7 @@ const pickerSelectStyles = StyleSheet.create({
     borderColor: "gray",
     borderRadius: 4,
     color: "black",
-    paddingRight: 30, // to ensure the text is never behind the icon
+    paddingRight: 30,
     backgroundColor: "white",
   },
   inputAndroid: {
@@ -251,10 +262,10 @@ const pickerSelectStyles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderWidth: 0.5,
-    borderColor: "purple",
+    borderColor: "gray",
     borderRadius: 8,
     color: "black",
-    paddingRight: 30, // to ensure the text is never behind the icon
+    paddingRight: 30,
     backgroundColor: "white",
   },
 });

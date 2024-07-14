@@ -1,5 +1,13 @@
 import * as React from 'react';
-import { StyleSheet, Pressable, View, Text, Image, ImageBackground } from 'react-native';
+import {
+  StyleSheet,
+  Pressable,
+  View,
+  Text,
+  Image,
+  ImageBackground,
+  Platform,
+} from "react-native";
 
 const backgroundLeaf = require('../assets/backgroundtest.jpg');
 const logo = require('../assets/FloraFinderLogo.png');
@@ -47,7 +55,7 @@ const styles = StyleSheet.create({
     },
     logoContainer: {
         position: 'absolute',
-        top: 40, // Adjust as needed for spacing from the top
+        top: 40,
         left: 0,
         right: 0,
         alignItems: 'center',
@@ -71,10 +79,10 @@ const styles = StyleSheet.create({
     },
     overlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(255, 255, 255, 0.8)', //backgorund contrast, last number is the contract scale
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
     },
     logo: {
-        width: 250, // Adjust width and height, both need to change
+        width: 250,
         height: 350,
         resizeMode: 'contain',
     },

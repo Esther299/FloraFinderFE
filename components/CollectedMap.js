@@ -1,249 +1,215 @@
 import React from "react";
 import { useContext, useEffect, useState } from "react";
 import {
-    StyleSheet,
-    View,
-    Text,
-    ActivityIndicator,
-    Image,
-    ImageBackground,
+  StyleSheet,
+  View,
+  Text,
+  ActivityIndicator,
+  Image,
+  ImageBackground,
+  Platform,
 } from "react-native";
 import MapView, {
-    Marker,
-    Callout,
-    Heatmap,
-    PROVIDER_GOOGLE,
+  Marker,
+  Callout,
+  Heatmap,
+  PROVIDER_GOOGLE,
 } from "react-native-maps";
 import { WebView } from "react-native-webview";
 import * as Location from "expo-location";
 
 import { UserContext } from "../contexts/Contexts";
-import { getCollectedPlantsList, getCollections } from "../api/apiFunctions.js";
+import { getCollections } from "../api/apiFunctions.js";
 import {
-    parseGeoTagLatitude,
-    parseGeoTagLongitude,
+  parseGeoTagLatitude,
+  parseGeoTagLongitude,
 } from "../utils/parseGeoTag";
 
 const backgroundLeaf = require("../assets/backgroundtest.jpg");
 
-// const flowerIconsArr = require("../assets/flowerIcons/flowerIcons.js");
 const plantIconsArr = require("../assets/plantIcons/plantIcons.js");
+const flowerIconsArr = require("../assets/flowerIcons/flowerIcons.js");
 
 export default function CollectedMap({ navigation }) {
-    // const [heatMapPoints, setHeatMapPoints] = useState([]);
+  const { user, setUser } = useContext(UserContext);
 
-    const { user, setUser } = useContext(UserContext);
+  const [isLocating, setIsLocating] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [location, setLocation] = useState(null);
+  const [plantIcons, setPlantIcons] = useState(plantIconsArr);
+  const [flowerIcons, setFlowerIcons] = useState(flowerIconsArr);
+  const [plantsArr, setPlantsArr] = useState([]);
 
-    const [isLocating, setIsLocating] = useState(true);
-    const [isLoading, setIsLoading] = useState(true);
-    const [location, setLocation] = useState(null);
-    // const [flowerIcons, setFlowerIcons] = useState(flowerIconsArr);
-    const [plantIcons, setplantIcons] = useState(plantIconsArr);
-    const [plantsArr, setPlantsArr] = useState([]);
+  useEffect(() => {
+    console.log("USE EFFECT in COLLECTED MAP");
+    setIsLoading(true);
+    getCollections().then((plants) => {
+      setPlantsArr(plants);
+    });
 
-    useEffect(() => {
-        console.log("USE EFFECT in COLLECTED MAP");
-        setIsLoading(true);
-        getCollections().then((plants) => {
-            setPlantsArr(plants);
+    (async () => {
+      setIsLocating(true);
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
+      let location = await Location.getCurrentPositionAsync();
+      setLocation(location);
+      setIsLocating(false);
+    })();
 
-            // adds coords to heat map
-            /*usersPlants.map((plant) => {
-                setHeatMapPoints([
-                    ...heatMapPoints,
-                    {
-                        longitude: parseGeoTagLongitude(plant),
-                        latitude: parseGeoTagLatitude(plant),
-                        weight: 1,
-                    },
-                ]);
-            });
-            */
-        });
+    setIsLoading(false);
+  }, []);
 
-        (async () => {
-            setIsLocating(true);
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== "granted") {
-                setErrorMsg("Permission to access location was denied");
-                return;
-            }
-            let location = await Location.getCurrentPositionAsync();
-            setLocation(location);
-            setIsLocating(false);
-        })();
-
-        setIsLoading(false);
-    }, []);
-
-    if (isLoading || isLocating) {
-        return (
-            <ImageBackground
-                source={backgroundLeaf}
-                style={styles.imageBackground}
-                resizeMode="cover"
-            >
-                <View style={styles.overlay} />
-                <View style={styles.activity_indicator_background}>
-                    <ActivityIndicator size="large" color="#006400" />
-                    <Text>Loading...</Text>
-                </View>
-            </ImageBackground>
-        );
-    }
+  if (isLoading || isLocating) {
     return (
-        <View style={styles.map_container}>
-            <MapView
-                style={styles.map_view}
-                showsUserLocation={true}
-                followsUserLocation={true}
-                // provider={PROVIDER_GOOGLE}
-                region={{
-                    latitude: location.coords.latitude,
-                    longitude: location.coords.longitude,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.02,
-                }}
-            >
-                {plantsArr.map((plant, index) => (
-                    <Marker
-                        key={index}
-                        coordinate={{
-                            longitude: parseGeoTagLongitude(plant),
-                            latitude: parseGeoTagLatitude(plant),
-                        }}
-                    >
-                        <Image
-                            source={
-                                plantIcons[
-                                    Math.floor(
-                                        Math.random() * plantIcons.length
-                                    )
-                                ]
-                            }
-                            style={{ width: 50, height: 50 }}
-                            resizeMode="center"
-                            resizeMethod="resize"
-                        />
-                        <Callout
-                            tooltip={true}
-                            onPress={() => {
-                                navigation.navigate("Single Plant", {
-                                    plant: plant,
-                                });
-                            }}
-                        >
-                            <View style={styles.callout_container}>
-                                <View style={styles.callout_template}>
-                                    <WebView
-                                        style={styles.callout_image}
-                                        source={{ uri: plant.image }}
-                                    />
-                                    <View style={styles.text_container_1}>
-                                        <Text style={styles.text_1}>
-                                            {plant.speciesName}
-                                        </Text>
-                                    </View>
-                                    <View style={styles.text_container_2}>
-                                        <Text style={styles.text_2}>
-                                            {plant.plantId}
-                                        </Text>
-                                    </View>
-                                </View>
-                            </View>
-                        </Callout>
-                    </Marker>
-                ))}
-
-                {/* {heatMapPoints[0] ? (
-                    <Heatmap
-                        opacity={0.5}
-                        radius={30}
-                        points={heatMapPoints}
-                    ></Heatmap>
-                ) : null} */}
-            </MapView>
+      <ImageBackground
+        source={backgroundLeaf}
+        style={styles.imageBackground}
+        resizeMode="cover"
+      >
+        <View style={styles.overlay} />
+        <View style={styles.activityIndicatorBackground}>
+          <ActivityIndicator size="large" color="#006400" />
+          <Text>Loading map...</Text>
         </View>
+      </ImageBackground>
     );
+  }
+
+  return (
+    <View style={styles.mapContainer}>
+      <MapView
+        style={styles.mapView}
+        showsUserLocation={true}
+        followsUserLocation={true}
+        region={{
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.02,
+        }}
+      >
+        {plantsArr.map((plant, index) => {
+          const isUserPlant = plant.username === user.username;
+          return (
+            <Marker
+              key={index}
+              coordinate={{
+                longitude: parseGeoTagLongitude(plant),
+                latitude: parseGeoTagLatitude(plant),
+              }}
+            >
+              <Image
+                source={
+                  isUserPlant
+                    ? flowerIcons[Math.floor(Math.random() * flowerIcons.length)]
+                    : plantIcons[Math.floor(Math.random() * plantIcons.length)]
+                }
+                style={{ width: 50, height: 50 }}
+                resizeMode="center"
+                resizeMethod="resize"
+              />
+              <Callout
+                tooltip={true}
+                onPress={() => {
+                  navigation.navigate("Single Plant", {
+                    plant: plant,
+                  });
+                }}
+              >
+                <View style={styles.calloutContainer}>
+                  <View style={styles.calloutTemplate}>
+                    <WebView
+                      style={styles.calloutImage}
+                      source={{ uri: plant.image }}
+                    />
+                    <View style={styles.textContainer1}>
+                      <Text style={styles.text1}>{plant.speciesName}</Text>
+                      {isUserPlant && (
+                        <Text style={styles.userPlantIndicator}>
+                          Your Plant
+                        </Text>
+                      )}
+                    </View>
+                    <View style={styles.textContainer2}>
+                      <Text style={styles.text2}>{plant.plantId}</Text>
+                    </View>
+                  </View>
+                </View>
+              </Callout>
+            </Marker>
+          );
+        })}
+      </MapView>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    map_container: {
-        flex: 1,
-    },
-    map_view: {
-        width: "100%",
-        height: "100%",
-    },
-    callout_container: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        borderRadius: 10,
-        overflow: "hidden",
-    },
-    callout_template: {
-        width: 100,
-        height: 100,
-        boxShadow: "10px 10px 17px -12px rgba(0,0,0,0.75)",
-        borderRadius: 10,
-    },
-    callout_image: {
-        width: 100,
-        height: 100,
-        borderRadius: 10,
-    },
-    text_container_1: {
-        position: "absolute",
-        width: "100%",
-        height: 14,
-        paddingHorizontal: "7%",
-        backgroundColor: "rgba(0,0,0, 0.3)",
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-    },
-    text_container_2: {
-        position: "absolute",
-        width: "100%",
-        height: 14,
-        bottom: 0,
-        paddingHorizontal: "7%",
-        backgroundColor: "rgba(0,0,0, 0.3)",
-        borderBottomLeftRadius: 10,
-        borderBottomRightRadius: 10,
-        alignItems: "flex-end",
-    },
-    text_1: {
-        fontSize: 10,
-        fontWeight: "bold",
-        letterSpacing: 0.25,
-        color: "white",
-    },
-    text_2: {
-        fontSize: 10,
-        letterSpacing: 0.25,
-        color: "white",
-    },
-    loadPage: {
-        backgroundColor: "#CCFFCC",
-    },
-    activity_indicator_background: {
-        backgroundColor: "transparent",
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    imageBackground: {
-        flex: 1,
-        width: "100%",
-        height: "100%",
-    },
-    overlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: "rgba(255, 255, 255, 0.8)",
-    },
-    icon: {
-        width: 25,
-        aspectRatio: 1,
-    },
+  imageBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  activityIndicatorBackground: {
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  mapContainer: {
+    flex: 1,
+  },
+  mapView: {
+    flex: 1,
+  },
+  calloutContainer: {
+    width: 200,
+    padding: 10,
+    backgroundColor: "white",
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+  },
+  calloutTemplate: {
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  calloutImage: {
+    width: 150,
+    height: 150,
+  },
+  textContainer1: {
+    marginVertical: 5,
+    alignItems: "center",
+  },
+  text1: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  userPlantIndicator: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "green",
+  },
+  textContainer2: {
+    marginVertical: 5,
+    alignItems: "center",
+  },
+  text2: {
+    fontSize: 14,
+    color: "gray",
+  },
 });

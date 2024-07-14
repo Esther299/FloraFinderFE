@@ -11,6 +11,7 @@ import {
   Image,
   ImageBackground,
   Pressable,
+  Platform,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import User from "./User";
@@ -72,14 +73,14 @@ export default function LeagueTable() {
   }
 
   return (
-    <ImageBackground
-      source={backgroundLeaf}
-      style={styles.background}
-      resizeMode="cover"
-    >
-      <View style={styles.overlay} />
-      <View style={styles.container}>
-        <ScrollView style={styles.scrollView}>
+    <ScrollView style={styles.scrollView}>
+      <ImageBackground
+        source={backgroundLeaf}
+        style={styles.background}
+        resizeMode="cover"
+      >
+        <View style={styles.overlay} />
+        <View style={styles.container}>
           <Text style={styles.heading}>League Table</Text>
           <View style={styles.tableContainer}>
             <View style={styles.table}>
@@ -102,14 +103,14 @@ export default function LeagueTable() {
                     navigation.navigate("User", { user });
                   }}
                 >
-                  <User user ={user} index ={index}/>
+                  <User user={user} index={index} />
                 </Pressable>
               ))}
             </View>
           </View>
-        </ScrollView>
-      </View>
-    </ImageBackground>
+        </View>
+      </ImageBackground>
+    </ScrollView>
   );
 }
 

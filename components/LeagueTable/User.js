@@ -1,5 +1,5 @@
 import * as React from "react";
-import { StyleSheet, View, Text, Image } from "react-native";
+import { StyleSheet, View, Text, Image, Platform } from "react-native";
 
 export default function User({ user, index }) {
   return (
@@ -30,35 +30,43 @@ export default function User({ user, index }) {
 const styles = StyleSheet.create({
   cell: {
     flex: 1,
-    padding: 10,
-    borderRightWidth: 1,
-    borderColor: "#ddd",
     justifyContent: "center",
     alignItems: "center",
+    paddingVertical: 10,
   },
   columnAvatar: {
-    flex: 1,
-  },
-  columnUsername: {
-    flex: 1,
-  },
-  columnScore: {
-    flex: 1,
-  },
-  columnRank: {
-    flex: 1,
+    flex: 2,
   },
   avatarContainer: {
     justifyContent: "center",
     alignItems: "center",
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    overflow: "hidden",
   },
   avatar: {
-    width: 50,
-    height: 100,
-    borderRadius: 20,
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+  columnUsername: {
+    flex: 3,
+    justifyContent: "center",
+    alignItems: "flex-start",
+  },
+  columnScore: {
+    flex: 2,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  columnRank: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   cellText: {
-    textAlign: "center",
+    fontSize: 16,
     color: "#333",
   },
 });
