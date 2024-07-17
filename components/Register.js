@@ -1,19 +1,22 @@
 import * as React from "react";
 import {
-    TextInput,
-    StyleSheet,
-    Platform,
-    Pressable,
-    Text,
-    View,
-    Alert,
-    Image,
-    ScrollView,
-    ImageBackground,
+  TextInput,
+  StyleSheet,
+  Platform,
+  Pressable,
+  Text,
+  View,
+  Alert,
+  Image,
+  ScrollView,
+  ImageBackground,
+  ActivityIndicator,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { useContext, useState } from "react";
+import { ErrContext } from "../contexts/Contexts";
 import { postNewUser } from "../api/apiFunctions";
 
 const backgroundLeaf = require("../assets/backgroundtest.jpg");
@@ -45,6 +48,9 @@ const validationSchema = yup.object().shape({
 });
 
 export default function Register({ navigation }) {
+  const { err, setErr } = useContext(ErrContext);
+  const [isLoading, setIsLoading] = useState(false);
+
   const {
     control,
     handleSubmit,
@@ -59,16 +65,17 @@ export default function Register({ navigation }) {
     },
   });
   const onSubmit = (data) => {
-    console.log(data, "data");
+    setIsLoading(true);
     const newUser = {
       username: data.username,
       name: data.firstName + " " + data.lastName,
       email: data.emailAddress,
       password: data.password,
     };
-    console.log(newUser);
-    postNewUser(newUser)
+    console.log(newUser, "posted user");
+    postNewUser(newUser, setErr)
       .then((user) => {
+        setIsLoading(false);
         Alert.alert("Registration complete!", "Please login to your account.", [
           {
             text: "Login",
@@ -77,11 +84,31 @@ export default function Register({ navigation }) {
           },
         ]);
       })
-      .catch((error) => {
-        console.log(error);
-        Alert.alert("Registration Failed!", `${error}`);
+      .catch(() => {
+        setIsLoading(false);
+        Alert.alert(
+          `${(err.status, err.msg)}`,
+          "Registration failed. Please try again."
+        );
       });
   };
+
+  if (isLoading) {
+    return (
+      <ImageBackground
+        source={backgroundLeaf}
+        style={styles.imageBackground}
+        resizeMode="cover"
+      >
+        <View style={styles.overlay} />
+        <View style={styles.activityIndicatorBackground}>
+          <ActivityIndicator size="large" color="#006400" />
+          <Text style={styles.loadingText}>Registering...</Text>
+        </View>
+      </ImageBackground>
+    );
+  }
+
   return (
     <ScrollView
       contentContainerStyle={styles.background}
@@ -206,6 +233,21 @@ export default function Register({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  imageBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  activityIndicatorBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 10,
+    color: "white",
+    fontSize: 16,
+  },
   scrollViewContainer: {
     flexGrow: 1,
   },
@@ -215,11 +257,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   overlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   container: {

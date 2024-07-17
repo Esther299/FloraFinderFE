@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { getUsers } from "../../api/apiFunctions";
 import {
   StyleSheet,
@@ -6,34 +6,38 @@ import {
   Text,
   ActivityIndicator,
   ScrollView,
-  TouchableOpacity,
   Dimensions,
-  Image,
   ImageBackground,
   Pressable,
-  Platform,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import User from "./User";
+import { ErrContext } from "../../contexts/Contexts";
 
 const screenWidth = Dimensions.get("window").width;
 const backgroundLeaf = require("../../assets/backgroundtest.jpg");
 
 export default function LeagueTable() {
+  const { err, setErr } = useContext(ErrContext);
   const [users, setUsers] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
 
   useEffect(() => {
-    getUsers()
+    setIsLoading(true)
+    getUsers(setErr)
       .then((fetchedUsers) => {
         if (fetchedUsers) {
           setUsers(fetchedUsers);
         }
         setIsLoading(false);
       })
-      .catch((error) => {
-        console.error("Error fetching users:", error);
+      .catch(() => {
+         Alert.alert(
+           `${(err.status, err.msg)}`,
+           "Error fetching users. Please try again."
+         );
         setIsLoading(false);
       });
   }, []);

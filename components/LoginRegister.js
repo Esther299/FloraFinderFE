@@ -6,7 +6,6 @@ import {
   Text,
   Image,
   ImageBackground,
-  Platform,
 } from "react-native";
 
 const backgroundLeaf = require('../assets/backgroundtest.jpg');

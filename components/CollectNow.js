@@ -9,9 +9,8 @@ import {
   ActivityIndicator,
   Image,
   ImageBackground,
-  Platform,
 } from "react-native";
-import { useRef, useState } from "react";
+import { createRef, useState } from "react";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { postPhotoToPlantNet } from "../api/apiFunctions";
 import * as ImagePicker from "expo-image-picker";
@@ -22,7 +21,7 @@ import {
   faMagnifyingGlassPlus,
   faMagnifyingGlassMinus,
 } from "@fortawesome/free-solid-svg-icons";
-const ref = React.createRef();
+const ref = createRef();
 
 const backgroundLeaf = require("../assets/backgroundtest.jpg");
 
@@ -66,7 +65,17 @@ export default function CollectNow({ navigation }) {
         setIsSettingPreview(false);
       });
     } catch (error) {
-      console.log(error, "<-- ERROR TAKE PICTURE");
+       Alert.alert(
+         "Error",
+         "There was an error taking the picture. Please try again.",
+         [
+           {
+             text: "OK",
+             style: "default",
+           },
+         ]
+       );
+       setIsSettingPreview(false);
     }
   };
   const handlePostPicture = async () => {
@@ -100,6 +109,7 @@ export default function CollectNow({ navigation }) {
       setZoomLevel(zoomLevel - 0.1);
     }
   };
+
   if (isLoading) {
     return (
       <ImageBackground
@@ -119,6 +129,7 @@ export default function CollectNow({ navigation }) {
       </ImageBackground>
     );
   }
+
   return (
     <CameraView
       ref={ref}

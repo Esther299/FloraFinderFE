@@ -6,16 +6,21 @@ import {
   Pressable,
   ActivityIndicator,
   ImageBackground,
-  Platform,
+  Alert,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useContext, useEffect, useState } from "react";
-import { UserContext } from "../../contexts/Contexts";
+import { UserContext, ErrContext } from "../../contexts/Contexts";
 import RNPickerSelect from "react-native-picker-select";
 import CollectedListCard from "./CollectedListCard";
 
 import { getCollectedPlantsList } from "../../api/apiFunctions";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import {
+  faRotateLeft,
+  faArrowUp,
+  faArrowDown,
+} from "@fortawesome/free-solid-svg-icons";
 const backgroundLeaf = require("../../assets/backgroundtest.jpg");
 
 export default function CollectedList({ navigation }) {
@@ -132,12 +137,16 @@ export default function CollectedList({ navigation }) {
                 style={styles.iconButton}
                 onPress={() => setOrderBy(orderBy === "ASC" ? "DESC" : "ASC")}
               >
-                {orderBy === "ASC" ? <FontAwesomeIcon icon="fa-regular fa-up" color="white" /> : <FontAwesomeIcon icon="fa-regular fa-down" color="white" />}
+                {orderBy === "ASC" ? (
+                  <FontAwesomeIcon icon={faArrowUp} color="white" />
+                ) : (
+                  <FontAwesomeIcon icon={faArrowDown} color="white" />
+                )}
               </Pressable>
             </View>
             <View style={styles.queryButtonContainer}>
               <Pressable style={styles.resetButton} onPress={handleReset}>
-                <FontAwesomeIcon icon={fa - rotate - reverse} color="white" />
+                <FontAwesomeIcon icon={faRotateLeft} color="white" />
               </Pressable>
             </View>
           </View>

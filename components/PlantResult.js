@@ -9,7 +9,8 @@ import {
   ScrollView,
   Dimensions,
   ImageBackground,
-  Platform,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 
 import { Emitter } from "react-native-particles";
@@ -22,7 +23,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import { useContext, useEffect, useState } from "react";
-import { UserContext } from "../contexts/Contexts";
+import { UserContext, ErrContext } from "../contexts/Contexts";
 
 import { postNewPlantToCollection } from "../api/apiFunctions";
 import * as Location from "expo-location";
@@ -37,13 +38,14 @@ const backgroundLeaf = require("../assets/backgroundtest.jpg");
 export default function PlantResult({ route, navigation }) {
   const { plant } = route.params;
   const { user, setUser } = useContext(UserContext);
+  const { err, setErr } = useContext(ErrContext);
 
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
 
   const [isSaved, setIsSaved] = useState(false);
-  // const [isSaving, setIsSaving] = useState(false);
-  // const [isPosting, setIsPosting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
 
   const winWidth = Dimensions.get("window").width;
   const winHeight = Dimensions.get("window").height;
@@ -64,6 +66,7 @@ export default function PlantResult({ route, navigation }) {
 
   const handleSavePlantToCollection = () => {
     setIsSaved(false);
+    setIsSaving(true);
     if (location) {
       const username = user.username;
       const newCollection = {
@@ -79,13 +82,18 @@ export default function PlantResult({ route, navigation }) {
           plant.species.family.scientificNameWithoutAuthor
         ),
       };
-      postNewPlantToCollection(username, newCollection)
+      postNewPlantToCollection(username, newCollection, setErr)
         .then((response) => {
           console.log(response.speciesName, "RESPONSE in PLANTRESULT");
           setIsSaved(true);
+          setIsSaving(false);
         })
-        .catch((error) => {
-          console.log(error, "ERROR in PLANTRESULT");
+        .catch(() => {
+          setIsSaving(false);
+           Alert.alert(
+             `${(err.status, err.msg)}`,
+             "Failed to add plant to collection. Please try again."
+           );
         });
     }
   };
@@ -169,11 +177,16 @@ export default function PlantResult({ route, navigation }) {
           <TouchableOpacity
             style={styles.button}
             onPress={handleSavePlantToCollection}
+            disabled={isSaving}
           >
-            <Text style={styles.buttonText}>
-              Save To Collection{" "}
-              <FontAwesomeIcon icon={faBookmark} color={"white"} />
-            </Text>
+           {isSaving ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text style={styles.buttonText}>
+                Save To Collection{" "}
+                <FontAwesomeIcon icon={faBookmark} color={"white"} />
+              </Text>
+            )}
           </TouchableOpacity>
         )}
 

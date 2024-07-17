@@ -57,7 +57,7 @@ export default function Login() {
         } else {
           Alert.alert(
             `${(err.status, err.msg)}`,
-            "Sorry, something went wrong"
+            "Login failed. Please try again."
           );
         }
       });
@@ -129,6 +129,9 @@ export default function Login() {
               />
             )}
           />
+          {errors.password && (
+            <Text style={styles.alertText}>{errors.password.message}</Text>
+          )}
           <Pressable
             style={styles.button}
             title="Login"

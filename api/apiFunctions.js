@@ -11,7 +11,7 @@ const floraFinderApi = axios.create({
   baseURL: "http://16.170.228.135:3000/api",
 });
 
-export const postPhotoToPlantNet = (imageUri, setErr) => {
+export const postPhotoToPlantNet = (imageUri) => {
   let form = new FormData();
   const imageToAppend = {
     uri: imageUri,
@@ -31,7 +31,7 @@ export const postPhotoToPlantNet = (imageUri, setErr) => {
       return response.data.results[0];
     })
     .catch((error) => {
-      handleApiError(error, setErr, "postPhotoToPlantNet");
+      throw new Error(`plant API error: ${error}`);
     });
 };
 

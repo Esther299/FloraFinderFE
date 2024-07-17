@@ -6,19 +6,17 @@ import {
   Text,
   ActivityIndicator,
   Image,
+  Alert,
   ImageBackground,
-  Platform,
 } from "react-native";
 import MapView, {
   Marker,
   Callout,
-  Heatmap,
-  PROVIDER_GOOGLE,
 } from "react-native-maps";
 import { WebView } from "react-native-webview";
 import * as Location from "expo-location";
 
-import { UserContext } from "../contexts/Contexts";
+import { UserContext, ErrContext } from "../contexts/Contexts";
 import { getCollections } from "../api/apiFunctions.js";
 import {
   parseGeoTagLatitude,
@@ -32,9 +30,10 @@ const flowerIconsArr = require("../assets/flowerIcons/flowerIcons.js");
 
 export default function CollectedMap({ navigation }) {
   const { user, setUser } = useContext(UserContext);
+  const { err, setErr } = useContext(ErrContext);
 
   const [isLocating, setIsLocating] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [location, setLocation] = useState(null);
   const [plantIcons, setPlantIcons] = useState(plantIconsArr);
   const [flowerIcons, setFlowerIcons] = useState(flowerIconsArr);
@@ -43,9 +42,18 @@ export default function CollectedMap({ navigation }) {
   useEffect(() => {
     console.log("USE EFFECT in COLLECTED MAP");
     setIsLoading(true);
-    getCollections().then((plants) => {
-      setPlantsArr(plants);
-    });
+    getCollections(setErr)
+      .then((plants) => {
+        setIsLoading(false);
+        setPlantsArr(plants);
+      })
+      .catch(() => {
+        setIsLoading(false);
+        Alert.alert(
+          `${(err.status, err.msg)}`,
+          "Error fetching plants. Please try again."
+        );
+      });;
 
     (async () => {
       setIsLocating(true);

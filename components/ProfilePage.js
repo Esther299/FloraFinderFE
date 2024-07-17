@@ -9,7 +9,6 @@ import {
   Pressable,
   ActivityIndicator,
   ScrollView,
-  Platform,
 } from "react-native";
 import { getUserByUsername, deleteUser } from "../api/apiFunctions";
 import { ErrContext, UserContext } from "../contexts/Contexts";
@@ -20,25 +19,24 @@ const backgroundLeaf = require("../assets/backgroundtest.jpg");
 export default function ProfilePage() {
   const { user, setUser } = useContext(UserContext);
   const { err, setErr } = useContext(ErrContext);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    getUserByUsername(user.username)
+    setIsLoading(true);
+    getUserByUsername(user.username, setErr)
       .then((fetchedUser) => {
         setUser(fetchedUser);
         setIsLoading(false);
       })
-      .catch((error) => {
-        console.error("Error fetching profile", error);
+      .catch(() => {
         Alert.alert(
-          err.status,
-          err.msg,
+          `${(err.status, err.msg)}`,
           "Failed to load profile. Please try again."
         );
         setIsLoading(false);
       });
   }, [user.username]);
-  
+
   const handleDeleteUser = () => {
     Alert.alert(
       "Delete Account",
@@ -51,15 +49,16 @@ export default function ProfilePage() {
         {
           text: "OK",
           onPress: () => {
-            deleteUser(user.username)
+            setIsLoading(true);
+            deleteUser(user.username, setErr)
               .then(() => {
                 setUser({});
+                setIsLoading(false);
               })
-              .catch((error) => {
-                console.error("Error deleting user:", error);
+              .catch(() => {
+                setIsLoading(false);
                 Alert.alert(
-                  err.status,
-                  err.msg,
+                  `${(err.status, err.msg)}`,
                   "Failed to delete user. Please try again."
                 );
               });

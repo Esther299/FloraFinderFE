@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import * as React from "react";
 import {
   View,
   Text,
   StyleSheet,
-  ActivityIndicator,
   Image,
   ImageBackground,
 } from "react-native";
@@ -12,7 +11,6 @@ const backgroundLeaf = require("../../assets/backgroundtest.jpg");
 
 const UserCard = ({ route }) => {
   const { user } = route.params;
-  const [isLoading, setIsLoading] = useState(true);
 
   return (
     <ImageBackground
