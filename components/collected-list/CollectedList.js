@@ -15,10 +15,12 @@ import RNPickerSelect from "react-native-picker-select";
 import CollectedListCard from "./CollectedListCard";
 
 import { getCollectedPlantsList } from "../../api/apiFunctions";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 const backgroundLeaf = require("../../assets/backgroundtest.jpg");
 
 export default function CollectedList({ navigation }) {
   const { user, setUser } = useContext(UserContext);
+  const { err, setErr } = useContext(ErrContext);
 
   const [isLoading, setIsLoading] = useState(true);
   const [plants, setPlants] = useState([]);
@@ -32,7 +34,7 @@ export default function CollectedList({ navigation }) {
   useEffect(() => {
     const fetchAllSpeciesFamilies = async () => {
       try {
-        const fetchedPlants = await getCollectedPlantsList(username, {});
+        const fetchedPlants = await getCollectedPlantsList(username, {}, setErr);
         const uniqueSpeciesFamilies = [
           ...new Set(fetchedPlants.map((plant) => plant.speciesFamily)),
         ];
@@ -40,7 +42,7 @@ export default function CollectedList({ navigation }) {
         setIsLoading(false);
       } catch (err) {
         setIsLoading(false);
-        console.error(err);
+        Alert.alert(`${(err.status, err.msg)}`, "Sorry, something went wrong");
       }
     };
     fetchAllSpeciesFamilies();
@@ -56,12 +58,12 @@ export default function CollectedList({ navigation }) {
           speciesFamily: selectedSpeciesFamily,
           sortBy,
           orderBy,
-        });
+        }, setErr);
         setPlants(fetchedPlants);
         setIsLoading(false);
-      } catch (err) {
+      } catch {
         setIsLoading(false);
-        console.error(err);
+        Alert.alert(`${(err.status, err.msg)}`, "Sorry, something went wrong");
       }
     };
     fetchPlants();
@@ -130,16 +132,12 @@ export default function CollectedList({ navigation }) {
                 style={styles.iconButton}
                 onPress={() => setOrderBy(orderBy === "ASC" ? "DESC" : "ASC")}
               >
-                <Ionicons
-                  name={orderBy === "DESC" ? "arrow-down" : "arrow-up"}
-                  size={24}
-                  color="white"
-                />
+                {orderBy === "ASC" ? <FontAwesomeIcon icon="fa-regular fa-up" color="white" /> : <FontAwesomeIcon icon="fa-regular fa-down" color="white" />}
               </Pressable>
             </View>
             <View style={styles.queryButtonContainer}>
               <Pressable style={styles.resetButton} onPress={handleReset}>
-                <Text style={styles.buttonText}>Reset</Text>
+                <FontAwesomeIcon icon={fa - rotate - reverse} color="white" />
               </Pressable>
             </View>
           </View>
@@ -173,12 +171,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   overlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   activityIndicatorBackground: {
     flex: 1,

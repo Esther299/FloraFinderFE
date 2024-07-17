@@ -140,15 +140,15 @@ export default function CollectNow({ navigation }) {
             <FontAwesomeIcon icon={faMagnifyingGlassMinus} color={"white"} />
           </TouchableOpacity>
         </View>
-        <View style={styles.galleryButtonContainer}>
+        <View style={styles.buttonContainer}>
+        
           <TouchableOpacity
             style={styles.galleryButton}
             onPress={pickImageAsync}
           >
             <FontAwesomeIcon icon={faTh} color={"white"} />
           </TouchableOpacity>
-        </View>
-        <View style={styles.cameraButtonContainer}>
+        
           {isSettingPreview ? (
             <View style={styles.activityIndicatorPreview}>
               <ActivityIndicator size="large" color="#006400" />
@@ -169,7 +169,7 @@ export default function CollectNow({ navigation }) {
           )}
           {imageUri && !isSettingPreview ? (
             <TouchableOpacity
-              style={styles.cameraButton}
+              style={styles.idButton}
               onPress={handlePostPicture}
             >
               <Text style={styles.buttonText}>ID Plant</Text>
@@ -239,15 +239,17 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
-  galleryButtonContainer: {
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    marginVertical: 10,
   },
   galleryButton: {
     backgroundColor: "#006400",
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
+    width: "20%",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -256,16 +258,30 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-  },
-  cameraButtonContainer: {
-    alignItems: "center",
-    marginVertical: 10,
+    marginLeft: 40,
   },
   cameraButton: {
     backgroundColor: "#006400",
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
+    width: "20%",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    marginRight: 40,
+  },
+  idButton: {
+    backgroundColor: "#006400",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    width: "30%",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

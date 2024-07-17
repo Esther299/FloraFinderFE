@@ -87,7 +87,7 @@ const HomeStack = () => (
     <Stack.Screen name="League Table" component={LeagueTable} />
     <Stack.Screen name="Found Plant" component={PlantResult} />
     <Stack.Screen name="Single Plant" component={CollectedSingleCard} />
-    <Stack.Screen name="User" component={UserCard} />
+    <Stack.Screen name="User Card" component={UserCard} />
     <Stack.Screen name="Profile" component={ProfilePage} />
   </Stack.Navigator>
 );
@@ -101,7 +101,7 @@ const CollectNowStack = () => (
     <Stack.Screen name="League Table" component={LeagueTable} />
     <Stack.Screen name="Found Plant" component={PlantResult} />
     <Stack.Screen name="Single Plant" component={CollectedSingleCard} />
-    <Stack.Screen name="User" component={UserCard} />
+    <Stack.Screen name="User Card" component={UserCard} />
     <Stack.Screen name="Profile" component={ProfilePage} />
   </Stack.Navigator>
 );
@@ -115,7 +115,7 @@ const CollectedListStack = () => (
     <Stack.Screen name="League Table" component={LeagueTable} />
     <Stack.Screen name="Found Plant" component={PlantResult} />
     <Stack.Screen name="Single Plant" component={CollectedSingleCard} />
-    <Stack.Screen name="User" component={UserCard} />
+    <Stack.Screen name="UserCard" component={UserCard} />
     <Stack.Screen name="Profile" component={ProfilePage} />
   </Stack.Navigator>
 );

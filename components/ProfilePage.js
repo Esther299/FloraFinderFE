@@ -12,14 +12,14 @@ import {
   Platform,
 } from "react-native";
 import { getUserByUsername, deleteUser } from "../api/apiFunctions";
-import { UserContext } from "../contexts/Contexts";
+import { ErrContext, UserContext } from "../contexts/Contexts";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faUserXmark, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 const backgroundLeaf = require("../assets/backgroundtest.jpg");
 
 export default function ProfilePage() {
   const { user, setUser } = useContext(UserContext);
-  const { err, setErr } = useContext(UserContext);
+  const { err, setErr } = useContext(ErrContext);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -38,6 +38,7 @@ export default function ProfilePage() {
         setIsLoading(false);
       });
   }, [user.username]);
+  
   const handleDeleteUser = () => {
     Alert.alert(
       "Delete Account",

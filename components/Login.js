@@ -1,28 +1,28 @@
 import * as React from "react";
 import {
-    TextInput,
-    StyleSheet,
-    Pressable,
-    Text,
-    View,
-    ImageBackground,
-    Alert,
-    Image,
-    ScrollView,
-    Platform, 
-    Dimensions,
+  TextInput,
+  StyleSheet,
+  Pressable,
+  Text,
+  View,
+  ImageBackground,
+  Alert,
+  Image,
+  ScrollView,
+  Platform,
+  ActivityIndicator,
 } from "react-native";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { UserContext } from "../contexts/Contexts";
+import { ErrContext, UserContext } from "../contexts/Contexts";
 import { postLogin } from "../api/apiFunctions";
 const backgroundLeaf = require("../assets/backgroundtest.jpg");
 const logo = require("../assets/FloraFinderLogo.png");
 
-const { height } = Dimensions.get('window');
-
 export default function Login() {
   const { user, setUser } = useContext(UserContext);
+  const { err, setErr } = useContext(ErrContext);
+  const [isLoading, setIsLoading] = useState(false);
   const {
     control,
     handleSubmit,
@@ -42,20 +42,42 @@ export default function Login() {
   };
 
   const handleLogin = (username, password) => {
+    setIsLoading(true)
     const credentials = { username, password };
-    postLogin(credentials)
+    postLogin(credentials, setErr)
       .then((user) => {
-        if (!user) {
-          throw new Error("Invalid response from server");
-        }
         setUser(user);
+        setIsLoading(false);
         Alert.alert("You are logged in!", `Welcome back, ${user.username}`);
       })
-      .catch((error) => {
-        console.error("Login Failed:", error);
-        Alert.alert("Login Failed", "Invalid username or password.");
+      .catch(() => {
+        setIsLoading(false);
+        if (err.status === 404) {
+          Alert.alert(`${err.msg}`, "Try again");
+        } else {
+          Alert.alert(
+            `${(err.status, err.msg)}`,
+            "Sorry, something went wrong"
+          );
+        }
       });
   };
+
+  if (isLoading) {
+    return (
+      <ImageBackground
+        source={backgroundLeaf}
+        style={styles.imageBackground}
+        resizeMode="cover"
+      >
+        <View style={styles.overlay} />
+        <View style={styles.activityIndicatorBackground}>
+          <ActivityIndicator size="large" color="#006400" />
+          <Text style={styles.loadingText}>Logging in...</Text>
+        </View>
+      </ImageBackground>
+    );
+  }
 
   return (
     <ScrollView
@@ -107,10 +129,6 @@ export default function Login() {
               />
             )}
           />
-          {errors.password && (
-            <Text style={styles.alertText}>{errors.password.message}</Text>
-          )}
-
           <Pressable
             style={styles.button}
             title="Login"
@@ -125,6 +143,21 @@ export default function Login() {
 }
 
 const styles = StyleSheet.create({
+  imageBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  activityIndicatorBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 10,
+    color: "white",
+    fontSize: 16,
+  },
   scrollViewContainer: {
     flexGrow: 1,
   },
@@ -134,11 +167,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   overlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   container: {

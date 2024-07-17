@@ -11,6 +11,7 @@ export default function User({ user, index }) {
               uri: user.avatar,
             }}
             style={styles.avatar}
+            resizeMode="contain"
           />
         </View>
       </View>
@@ -35,15 +36,13 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   columnAvatar: {
-    flex: 2,
+    flex: 3,
   },
   avatarContainer: {
     justifyContent: "center",
     alignItems: "center",
     width: 50,
     height: 50,
-    borderRadius: 25,
-    overflow: "hidden",
   },
   avatar: {
     width: "100%",
@@ -51,7 +50,7 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   columnUsername: {
-    flex: 3,
+    flex: 2,
     justifyContent: "center",
     alignItems: "flex-start",
   },
@@ -61,7 +60,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   columnRank: {
-    flex: 1,
+    flex: 2,
     justifyContent: "center",
     alignItems: "center",
   },

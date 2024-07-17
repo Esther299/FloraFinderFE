@@ -92,8 +92,8 @@ export default function PlantResult({ route, navigation }) {
 
   return (
     <ScrollView
-      style={styles.scroll_view_container}
-      contentContainerStyle={styles.scrollViewContent}
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
     >
       <ImageBackground
         source={backgroundLeaf}
@@ -102,52 +102,38 @@ export default function PlantResult({ route, navigation }) {
       >
         <View style={styles.overlay} />
 
-        <View style={styles.heading_container}>
-          <Text style={styles.heading_1}>{user.username}, you've found a</Text>
-          <Text style={styles.heading_2}>
+        <View style={styles.headingContainer}>
+          <Text style={styles.heading1}>{user.username}, you've found a</Text>
+          <Text style={styles.heading2}>
             {formatName(plant.species.commonNames[0])}!
           </Text>
         </View>
-        <View style={styles.result_card}>
-          <View style={styles.scientifc_container}>
-            <View style={styles.label_container}>
-              <Text style={styles.label}>Scientific Name: </Text>
-            </View>
-            <View style={styles.value_container}>
-              <Text style={styles.value}>
-                {formatName(plant.species.scientificNameWithoutAuthor)}
-              </Text>
-            </View>
+
+        <View style={styles.resultCard}>
+          <View style={styles.sectionContainer}>
+            <Text style={styles.label}>Scientific Name:</Text>
+            <Text style={styles.value}>
+              {formatName(plant.species.scientificNameWithoutAuthor)}
+            </Text>
           </View>
 
-          <View style={styles.family_container}>
-            <View style={styles.label_container}>
-              <Text style={styles.label}>Plant Family: </Text>
-            </View>
-            <View style={styles.value_container}>
-              <Text style={styles.value}>
-                {formatName(plant.species.family.scientificNameWithoutAuthor)}
-              </Text>
-            </View>
+          <View style={styles.sectionContainer}>
+            <Text style={styles.label}>Plant Family:</Text>
+            <Text style={styles.value}>
+              {formatName(plant.species.family.scientificNameWithoutAuthor)}
+            </Text>
           </View>
 
-          <View style={styles.score_container}>
-            <View style={styles.label_container}>
-              <Text style={styles.label}>Match Score: </Text>
-            </View>
-            <View style={styles.value_container}>
-              <Text
-                style={
-                  plant.score > 0.5
-                    ? styles.text_score_good
-                    : styles.text_score_bad
-                }
-              >
+          <View style={styles.sectionContainer}>
+            <Text style={styles.label}>Match Score:</Text>
+            <View style={[styles.scoreContainer, plant.score > 0.5 ? styles.scoreGood : styles.scoreBad]}>
+              <Text style={styles.scoreText}>
                 {(plant.score * 100).toFixed(2)}%
               </Text>
-            </View>
+              </View>
           </View>
-          <View style={styles.image_container}>
+
+          <View style={styles.imageContainer}>
             <Emitter
               style={styles.emitter}
               numberOfParticles={300}
@@ -172,10 +158,10 @@ export default function PlantResult({ route, navigation }) {
             ) : null}
           </View>
         </View>
+
         {isSaved ? (
           <TouchableOpacity style={styles.button}>
-            <Text style={styles.button_text}>
-              {" "}
+            <Text style={styles.buttonText}>
               Saved! <FontAwesomeIcon icon={faBookmark} color={"white"} />
             </Text>
           </TouchableOpacity>
@@ -184,29 +170,30 @@ export default function PlantResult({ route, navigation }) {
             style={styles.button}
             onPress={handleSavePlantToCollection}
           >
-            <Text style={styles.button_text}>
-              {" "}
+            <Text style={styles.buttonText}>
               Save To Collection{" "}
               <FontAwesomeIcon icon={faBookmark} color={"white"} />
             </Text>
           </TouchableOpacity>
         )}
+
         <Pressable
           style={styles.button}
-          title="Go Back"
+          title="Find Another Plant"
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.button_text}>
+          <Text style={styles.buttonText}>
             Find Another Plant{" "}
             <FontAwesomeIcon icon={faCamera} color={"white"} />
           </Text>
         </Pressable>
+
         <Pressable
           style={styles.button}
-          title="Home Page"
+          title="Back To Home"
           onPress={() => navigation.navigate("Home")}
         >
-          <Text style={styles.button_text}>
+          <Text style={styles.buttonText}>
             Back To Home <FontAwesomeIcon icon={faHome} color={"white"} />
           </Text>
         </Pressable>
@@ -216,134 +203,117 @@ export default function PlantResult({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-  imageBackground: {
+  container: {
     flex: 1,
+  },
+  contentContainer: {
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  imageBackground: {
     width: "100%",
     height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
-  scroll_view_container: {
-    flex: 1,
-  },
-  scrollViewContent: {
+  headingContainer: {
     alignItems: "center",
-    paddingBottom: 20,
+    marginBottom: 20,
   },
-  heading_container: {
-    marginTop: 20,
-    alignItems: "center",
-  },
-  heading_1: {
-    marginTop: 20,
+  heading1: {
+    fontSize: 20,
     fontWeight: "bold",
-    color: "#006400",
+    color: "white",
     textAlign: "center",
-    fontFamily: "Inter_900Black",
-    fontSize: 25,
   },
-  heading_2: {
-    marginBottom: 10,
+  heading2: {
+    fontSize: 24,
     fontWeight: "bold",
-    color: "#006400",
+    color: "#32CD32",
     textAlign: "center",
-    fontFamily: "Inter_900Black",
-    fontSize: 40,
   },
-  result_card: {
+  resultCard: {
     backgroundColor: "white",
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 4,
-    elevation: 3,
-    margin: 8,
+    borderRadius: 10,
+    padding: 20,
     width: "90%",
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
   },
-  scientifc_container: {
+  sectionContainer: {
     flexDirection: "row",
     marginBottom: 10,
-  },
-  family_container: {
-    flexDirection: "row",
-    marginBottom: 10,
-  },
-  score_container: {
-    flexDirection: "row",
-    marginBottom: 10,
-  },
-  label_container: {
-    flex: 1,
   },
   label: {
-    fontSize: 15,
+    flex: 2,
+    fontSize: 16,
     fontWeight: "bold",
-    alignSelf: "flex-start",
     color: "#006400",
-  },
-  value_container: {
-    flex: 1,
   },
   value: {
-    flexWrap: "wrap",
-    textAlign: "right",
-    fontSize: 15,
-    alignSelf: "flex-end",
+    flex: 2,
+    fontSize: 16,
+    color: "black",
   },
-  button_container: {
-    flex: 1,
-    flexDirection: "column",
-    backgroundColor: "transparent",
-    margin: 64,
+  scoreContainer: {
+    backgroundColor: "lightgray",
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    fontSize: 16,
+    marginRight: 85,
   },
-  image_container: {
-    flex: 1,
+  scoreText: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  scoreGood: {
+    backgroundColor: "#32CD32",
+  },
+  scoreBad: {
+    backgroundColor: "#FF0000",
+  },
+  imageContainer: {
     alignItems: "center",
-    justifyContent: "center",
-    marginVertical: "20",
+    marginBottom: 20,
+    position: "relative",
   },
   emitter: {
-    zIndex: 0,
+    ...StyleSheet.absoluteFillObject,
   },
   image: {
-    borderRadius: 90,
-    width: 175,
-    height: 175,
-    paddingVertical: 12,
-    zIndex: 1,
+    width: 200,
+    height: 200,
+    borderRadius: 10,
   },
   sticker: {
+    width: 50,
+    height: 50,
     position: "absolute",
-    width: 100,
-    height: 100,
-    transform: [{ rotate: "335deg" }],
-    right: 1,
-    zIndex: 2,
+    bottom: 10,
+    right: 10,
   },
   button: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 4,
-    elevation: 3,
     backgroundColor: "#006400",
-    margin: 10,
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    width: "90%",
+    alignItems: "center",
   },
-  button_text: {
+  buttonText: {
     color: "white",
-  },
-  text_score_good: {
-    fontSize: 22,
+    fontSize: 16,
     fontWeight: "bold",
-    color: "#006400",
-    alignSelf: "flex-end",
-  },
-  text_score_bad: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "red",
-    alignSelf: "flex-end",
+    textAlign: "center",
   },
 });

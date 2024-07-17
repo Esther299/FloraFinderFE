@@ -27,7 +27,6 @@ export default function LeagueTable() {
   useEffect(() => {
     getUsers()
       .then((fetchedUsers) => {
-        console.log("Fetched Users:", fetchedUsers);
         if (fetchedUsers) {
           setUsers(fetchedUsers);
         }
@@ -94,18 +93,20 @@ export default function LeagueTable() {
                   </View>
                 ))}
               </View>
-              {users.map((user, index) => (
-                <Pressable
-                  key={index}
-                  title="UserCard"
-                  style={styles.card}
-                  onPress={() => {
-                    navigation.navigate("User", { user });
-                  }}
-                >
-                  <User user={user} index={index} />
-                </Pressable>
-              ))}
+              <ScrollView>
+                {users.map((user, index) => (
+                  <Pressable
+                    key={index}
+                    title="User Card"
+                    style={styles.card}
+                    onPress={() => {
+                      navigation.navigate("User Card", { user });
+                    }}
+                  >
+                    <User user={user} index={index} />
+                  </Pressable>
+                ))}
+              </ScrollView>
             </View>
           </View>
         </View>
@@ -166,7 +167,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#006400",
   },
   headerCell: {
-    padding: 10,
+    paddingTop: 20,
+    paddingBottom: 20,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -180,15 +182,15 @@ const styles = StyleSheet.create({
     borderBottomColor: "#ddd",
   },
   columnAvatar: {
-    flex: 1,
+    flex: 2.2,
   },
   columnUsername: {
-    flex: 1,
+    flex: 2.2,
   },
   columnScore: {
-    flex: 1,
+    flex: 1.8,
   },
   columnRank: {
-    flex: 1,
+    flex: 1.8,
   },
 });

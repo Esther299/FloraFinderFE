@@ -1,5 +1,6 @@
 import axios from "axios";
 const FormData = require("form-data");
+import handleApiError from "./apiErrorHandling.js";
 
 const plantNetApi = axios.create({
   baseURL: "https://my-api.plantnet.org",
@@ -10,7 +11,7 @@ const floraFinderApi = axios.create({
   baseURL: "http://16.170.228.135:3000/api",
 });
 
-export const postPhotoToPlantNet = (imageUri) => {
+export const postPhotoToPlantNet = (imageUri, setErr) => {
   let form = new FormData();
   const imageToAppend = {
     uri: imageUri,
@@ -30,11 +31,11 @@ export const postPhotoToPlantNet = (imageUri) => {
       return response.data.results[0];
     })
     .catch((error) => {
-      handleApiError(error, "postPhotoToPlantNet");
+      handleApiError(error, setErr, "postPhotoToPlantNet");
     });
 };
 
-export const postNewUser = (newUser) => {
+export const postNewUser = (newUser, setErr) => {
   console.log("postNewUser API");
   return floraFinderApi
     .post(`/users`, newUser)
@@ -42,11 +43,11 @@ export const postNewUser = (newUser) => {
       return response.data.user;
     })
     .catch((error) => {
-      handleApiError(error, "postNewUser");
+      handleApiError(error, setErr, "postNewUser");
     });
 };
 
-export const postNewPlantToCollection = (username, newCollection) => {
+export const postNewPlantToCollection = (username, newCollection, setErr) => {
   console.log("postNewPlant API");
   return floraFinderApi
     .post(`/users/${username}/collections`, newCollection)
@@ -54,11 +55,11 @@ export const postNewPlantToCollection = (username, newCollection) => {
       return response.data.collection;
     })
     .catch((error) => {
-      handleApiError(error, "postNewPlantToCollection");
+      handleApiError(error, setErr, "postNewPlantToCollection");
     });
 };
 
-export const getUserByUsername = (username) => {
+export const getUserByUsername = (username, setErr) => {
   console.log("getUser API");
   return floraFinderApi
     .get(`/users/${username}`)
@@ -66,11 +67,11 @@ export const getUserByUsername = (username) => {
       return response.data.user;
     })
     .catch((error) => {
-      handleApiError(error, "getUserByUsername");
+      handleApiError(error, setErr, "getUserByUsername");
     });
 };
 
-export const getCollectedPlantsList = (username, options) => {
+export const getCollectedPlantsList = (username, options, setErr) => {
   console.log("getPlantList API");
   const { speciesFamily, sortBy, orderBy } = options;
 
@@ -89,11 +90,11 @@ export const getCollectedPlantsList = (username, options) => {
     .get(url)
     .then((response) => response.data.collections)
     .catch((error) => {
-      handleApiError(error, "getCollectedPlantsList");
+      handleApiError(error, setErr, "getCollectedPlantsList");
     });
 };
 
-export const getUsers = () => {
+export const getUsers = (setErr) => {
   console.log("getUsers API");
   return floraFinderApi
     .get("/users")
@@ -101,11 +102,11 @@ export const getUsers = () => {
       return response.data.users;
     })
     .catch((error) => {
-      handleApiError(error, "getUsers");
+      handleApiError(error, setErr, "getUsers");
     });
 };
 
-export const postLogin = (credentials) => {
+export const postLogin = (credentials, setErr) => {
   console.log("postLogin API");
   return floraFinderApi
     .post(`/users/login`, credentials)
@@ -113,11 +114,11 @@ export const postLogin = (credentials) => {
       return response.data.user;
     })
     .catch((error) => {
-      handleApiError(error, "postLogin");
+      handleApiError(error, setErr, "postLogin");
     });
 };
 
-export const deleteUser = (username) => {
+export const deleteUser = (username, setErr) => {
   console.log("deleteUser API");
   return floraFinderApi
     .delete(`/users/${username}`)
@@ -125,17 +126,17 @@ export const deleteUser = (username) => {
       return response.data;
     })
     .catch((error) => {
-      handleApiError(error, "deleteUser");
+      handleApiError(error, setErr, "deleteUser");
     });
 };
 
-export const getCollections = () => {
+export const getCollections = (setErr) => {
   return floraFinderApi
     .get("/collections")
     .then((response) => {
       return response.data.collections;
     })
     .catch((error) => {
-      handleApiError(error, "getCollections");
+      handleApiError(error, setErr, "getCollections");
     });
 };

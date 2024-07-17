@@ -48,42 +48,52 @@ export default function LoginRegister({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center', 
-        alignItems: 'center', 
-    },
-    logoContainer: {
-        position: 'absolute',
-        top: 40,
-        left: 0,
-        right: 0,
-        alignItems: 'center',
-    },
-    button: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 12,
-        paddingHorizontal: 32,
-        borderRadius: 4,
-        elevation: 3,
-        backgroundColor: '#006400',
-        width: '50%',
-        marginTop: 12,
-    },
-    buttonText: {
-        color: 'white',
-    },
-    background: {
-        flex: 1,
-    },
-    overlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    },
-    logo: {
-        width: 250,
-        height: 350,
-        resizeMode: 'contain',
-    },
+  background: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  logoContainer: {
+    alignItems: "center",
+    marginBottom: 50,
+  },
+  logo: {
+    width: 150,
+    height: 150,
+    resizeMode: "contain",
+  },
+  container: {
+    alignItems: "center",
+  },
+  button: {
+    backgroundColor: "#006400",
+    paddingVertical: 15,
+    paddingHorizontal: 50,
+    borderRadius: 8,
+    marginBottom: 20,
+    width: 200,
+    alignItems: "center",
+  },
+  buttonAndroid: {
+    elevation: 3,
+    shadowColor: "black",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+  },
+  buttonIOS: {
+    shadowColor: "black",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });
