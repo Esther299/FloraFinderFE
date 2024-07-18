@@ -1,288 +1,273 @@
 import {
-    ScrollView,
-    StyleSheet,
-    View,
-    Text,
-    Pressable,
-    ActivityIndicator,
-    ImageBackground,
+  ScrollView,
+  StyleSheet,
+  View,
+  Text,
+  Pressable,
+  ActivityIndicator,
+  ImageBackground,
+  Alert,
 } from "react-native";
-
 import { useContext, useEffect, useState } from "react";
-import { UserContext } from "../../contexts/Contexts";
-import DropDownPicker from "react-native-dropdown-picker";
+import { UserContext, ErrContext } from "../../contexts/Contexts";
+import RNPickerSelect from "react-native-picker-select";
 import CollectedListCard from "./CollectedListCard";
 
 import { getCollectedPlantsList } from "../../api/apiFunctions";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import {
+  faRotateLeft,
+  faArrowUp,
+  faArrowDown,
+} from "@fortawesome/free-solid-svg-icons";
 const backgroundLeaf = require("../../assets/backgroundtest.jpg");
 
 export default function CollectedList({ navigation }) {
-    const { user, setUser } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
+  const { err, setErr } = useContext(ErrContext);
 
-    const [isLoading, setIsLoading] = useState(true);
-    const [plantsArr, setPlantsArr] = useState([]);
-    const [items, setItems] = useState([]);
-    const [openFilter, setOpenFilter] = useState(false);
-    const [openSort, setOpenSort] = useState(false);
-    const [valueFilter, setValueFilter] = useState([]);
-    const [valueSort, setValueSort] = useState([]);
-    const [originalPlants, setOriginalPlants] = useState([]);
-    const [itemsSort, setItemsSort] = useState([
-        { label: "Score", value: "Score" },
-        { label: "Date", value: "Date" },
-        { label: "Name", value: "Name" },
-    ]);
-    const username = user.username;
+  const [isLoading, setIsLoading] = useState(true);
+  const [plants, setPlants] = useState([]);
+  const [speciesFamilies, setSpeciesFamilies] = useState([]);
+  const [selectedSpeciesFamily, setSelectedSpeciesFamily] = useState("");
+  const [sortBy, setSortBy] = useState("");
+  const [orderBy, setOrderBy] = useState("");
+  const username = user.username;
 
-    useEffect(() => {
-        setIsLoading(true);
-        getCollectedPlantsList(username).then((usersPlants) => {
-            setItems(() => {
-                const plantFamily = usersPlants.map((plant) => {
-                    {
-                        return plant.speciesFamily;
-                    }
-                });
-                let uniqueItems = plantFamily.filter(
-                    (plantFam, index) => plantFamily.indexOf(plantFam) === index
-                );
-
-                let noDuplicates = uniqueItems.map((plantFamily) => {
-                    {
-                        return { label: plantFamily, value: plantFamily };
-                    }
-                });
-
-                return noDuplicates;
-            });
-            setPlantsArr(usersPlants);
-            setOriginalPlants(usersPlants);
-            setIsLoading(false);
-        });
-    }, []);
-
-    const sortBy = (item) => {
-        console.log(item);
-        let newPlants = [...plantsArr];
-        const val = item[0].value;
-
-        if (val === "Date") {
-            newPlants.sort((a, b) => {
-                const aDate = new Date(a.dateCollected);
-                const bDate = new Date(b.dateCollected);
-                return bDate - aDate;
-            });
-
-            setPlantsArr(newPlants);
-            setValueSort(newPlants);
-        }
-        if (val === "Score") {
-            newPlants.sort((a, b) => {
-                return b.matchScore - a.matchScore;
-            });
-
-            setPlantsArr(newPlants);
-            setValueSort(newPlants);
-        } else if (val === "Name") {
-            newPlants.sort((a, b) =>
-                a.speciesName.localeCompare(b.speciesName)
-            );
-
-            setPlantsArr(newPlants);
-            setValueSort(newPlants);
-        }
+  // Fetch all species families on component mount
+  useEffect(() => {
+    const fetchAllSpeciesFamilies = async () => {
+      try {
+        const fetchedPlants = await getCollectedPlantsList(username, {}, setErr);
+        const uniqueSpeciesFamilies = [
+          ...new Set(fetchedPlants.map((plant) => plant.speciesFamily)),
+        ];
+        setSpeciesFamilies(uniqueSpeciesFamilies);
+        setIsLoading(false);
+      } catch (err) {
+        setIsLoading(false);
+        Alert.alert(`${(err.status, err.msg)}`, "Sorry, something went wrong");
+      }
     };
-    const filterByFamily = (item) => {
-        const val = item[0].value;
+    fetchAllSpeciesFamilies();
+  }, [username]);
 
-        let newPlants = [...plantsArr];
-
-        const filteredPlants = newPlants.filter(
-            (plant) => plant.speciesFamily === val
-        );
-
-        setPlantsArr(filteredPlants);
-        setValueFilter(filteredPlants);
+  // Fetch plants based on filter criteria
+  useEffect(() => {
+    console.log("USE EFFECT LOG");
+    setIsLoading(true);
+    const fetchPlants = async () => {
+      try {
+        const fetchedPlants = await getCollectedPlantsList(username, {
+          speciesFamily: selectedSpeciesFamily,
+          sortBy,
+          orderBy,
+        }, setErr);
+        setPlants(fetchedPlants);
+        setIsLoading(false);
+      } catch {
+        setIsLoading(false);
+        Alert.alert(`${(err.status, err.msg)}`, "Sorry, something went wrong");
+      }
     };
+    fetchPlants();
+  }, [username, selectedSpeciesFamily, sortBy, orderBy]);
 
-    const handleReset = () => {
-        setPlantsArr(originalPlants);
-    };
+  const handleReset = () => {
+    setSelectedSpeciesFamily("");
+    setSortBy("");
+    setOrderBy("");
+  };
 
-    if (isLoading) {
-        return (
-            <View style={styles.activityIndicatorBackground}>
-                <ActivityIndicator
-                    style={styles.loadPage}
-                    size="large"
-                    color="#006400"
-                />
-                <Text>Fetching list data...</Text>
-            </View>
-        );
-    }
-
+  if (isLoading) {
     return (
-        <ImageBackground
-            source={backgroundLeaf}
-            style={styles.background}
-            resizeMode="repeat"
-        >
-            <View style={styles.overlay}></View>
-            <View style={styles.container}>
-                <ScrollView style={styles.scrollView}>
-                    <View style={styles.query_container}>
-                        <View style={styles.query_button_container}>
-                            <DropDownPicker
-                                style={styles.dropdown}
-                                open={openFilter}
-                                dropDownContainerStyle={
-                                    styles.dropDownContainerStyle
-                                }
-                                listMode="SCROLLVIEW"
-                                placeholder="Filter"
-                                placeholderStyle={{
-                                    color: "white",
-                                    fontWeight: "bold",
-                                }}
-                                multipleText={"Filter"}
-                                showTickIcon={true}
-                                value={valueFilter}
-                                itemSeparator={true}
-                                listItemLabelStyle={styles.listItemLabelStyle}
-                                multiple={true}
-                                min={0}
-                                max={50}
-                                items={items}
-                                closeAfterSelecting={true}
-                                onSelectItem={(item) => {
-                                    filterByFamily(item);
-                                    setOpenFilter(false);
-                                }}
-                                setOpen={setOpenFilter}
-                            />
-                        </View>
-                        <View style={styles.query_button_container}>
-                            <DropDownPicker
-                                style={styles.dropdown}
-                                dropDownContainerStyle={
-                                    styles.dropDownContainerStyle
-                                }
-                                open={openSort}
-                                listMode="SCROLLVIEW"
-                                placeholder="Sort"
-                                placeholderStyle={{
-                                    color: "white",
-                                    fontWeight: "bold",
-                                }}
-                                multipleText={"Sort"}
-                                itemSeparator={true}
-                                value={valueSort}
-                                listItemLabelStyle={styles.listItemLabelStyle}
-                                multiple={true}
-                                min={0}
-                                max={10}
-                                items={itemsSort}
-                                closeAfterSelecting={true}
-                                onSelectItem={(item) => {
-                                    sortBy(item);
-                                    setOpenSort(false);
-                                }}
-                                setOpen={setOpenSort}
-                            />
-                        </View>
-                        <View style={styles.query_button_container}>
-                            <Pressable
-                                style={styles.reset_button}
-                                title="Reset"
-                                onPress={handleReset}
-                            >
-                                <Text style={styles.button_text}>Reset</Text>
-                            </Pressable>
-                        </View>
-                    </View>
-                    {plantsArr.map((plant, index) => (
-                        <Pressable
-                            key={index}
-                            style={styles.card}
-                            title="CollectedSingleCard"
-                            onPress={() => {
-                                navigation.navigate("Single Plant", {
-                                    plant: plant,
-                                });
-                            }}
-                        >
-                            <CollectedListCard plant={plant} />
-                        </Pressable>
-                    ))}
-                </ScrollView>
-            </View>
-        </ImageBackground>
+      <ImageBackground
+        source={backgroundLeaf}
+        style={styles.imageBackground}
+        resizeMode="cover"
+      >
+        <View style={styles.overlay} />
+        <View style={styles.activityIndicatorBackground}>
+          <ActivityIndicator size="large" color="#006400" />
+          <Text style={styles.loadingText}>Loading plants...</Text>
+        </View>
+      </ImageBackground>
     );
+  }
+
+  return (
+    <ScrollView style={styles.scrollView}>
+      <ImageBackground
+        source={backgroundLeaf}
+        style={styles.background}
+        resizeMode="repeat"
+      >
+        <View style={styles.overlay}></View>
+        <View style={styles.container}>
+          <View style={styles.queryContainer}>
+            <View style={styles.queryRow}>
+              <View style={styles.queryButtonContainer}>
+                <RNPickerSelect
+                  onValueChange={(value) => setSelectedSpeciesFamily(value)}
+                  items={speciesFamilies.map((family) => ({
+                    label: family,
+                    value: family,
+                  }))}
+                  placeholder={{ label: "Family", value: null }}
+                  style={pickerSelectStyles}
+                />
+              </View>
+              <View style={styles.queryButtonContainer}>
+                <RNPickerSelect
+                  onValueChange={(value) => setSortBy(value)}
+                  items={[
+                    { label: "Date", value: "dateCollected" },
+                    { label: "Score", value: "matchScore" },
+                    { label: "Name", value: "speciesName" },
+                  ]}
+                  placeholder={{ label: "Sort", value: null }}
+                  style={pickerSelectStyles}
+                />
+              </View>
+            </View>
+
+            <View style={styles.queryButtonContainer}>
+              <Pressable
+                style={styles.iconButton}
+                onPress={() => setOrderBy(orderBy === "ASC" ? "DESC" : "ASC")}
+              >
+                {orderBy === "ASC" ? (
+                  <FontAwesomeIcon icon={faArrowUp} color="white" />
+                ) : (
+                  <FontAwesomeIcon icon={faArrowDown} color="white" />
+                )}
+              </Pressable>
+            </View>
+            <View style={styles.queryButtonContainer}>
+              <Pressable style={styles.resetButton} onPress={handleReset}>
+                <FontAwesomeIcon icon={faRotateLeft} color="white" />
+              </Pressable>
+            </View>
+          </View>
+          {plants.map((plant, index) => (
+            <Pressable
+              key={index}
+              title="CollectedSingleCard"
+              style={styles.card}
+              onPress={() => {
+                navigation.navigate("Single Plant", {
+                  plant: plant,
+                });
+              }}
+            >
+              <CollectedListCard plant={plant} />
+            </Pressable>
+          ))}
+        </View>
+      </ImageBackground>
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({
-    scrollView: {},
-    container: {
-        flex: 1,
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    card: {
-        margin: 10,
-    },
-    background: {
-        flexGrow: 1,
-    },
-    backgroundImage: {
-        flexGrow: 1,
-        width: "100%",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    overlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: "rgba(255, 255, 255, 0.8)",
-    },
-    query_container: {
-        zIndex: 2000,
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        marginHorizontal: 10,
-    },
-    query_button_container: {
-        zIndex: 2000,
-        flex: 1,
-        margin: 1,
-    },
-    dropdown: {
-        zIndex: 2000,
-        flex: 1,
-        backgroundColor: "#006400",
-        alignItems: "center",
-        justifyContent: "center",
-        borderRadius: 10,
-        borderWidth: 0,
-    },
-    reset_button: {
-        zIndex: 2000,
-        flex: 1,
-        backgroundColor: "#006400",
-        alignItems: "flex-start",
-        justifyContent: "center",
-        paddingHorizontal: 10,
-        borderRadius: 10,
-    },
-    button_text: {
-        color: "white",
-        fontWeight: "bold",
-    },
-    dropDownContainerStyle: {
-        backgroundColor: "green",
-    },
-    listItemLabelStyle: {
-        color: "white",
-    },
+  imageBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  background: {
+    flex: 1,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  activityIndicatorBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 10,
+    color: "white",
+    fontSize: 16,
+  },
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  queryContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  queryRow: {
+    flexDirection: "row",
+    flex: 3,
+  },
+  queryButtonContainer: {
+    flex: 1,
+    margin: 5,
+  },
+  iconButton: {
+    marginTop: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 10,
+    backgroundColor: "#006400",
+    borderRadius: 5,
+  },
+  resetButton: {
+    marginTop: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 10,
+    backgroundColor: "#8B0000",
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  card: {
+    marginBottom: 10,
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+});
+
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 16,
+    width: 150,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: "gray",
+    borderRadius: 4,
+    color: "black",
+    paddingRight: 30,
+    backgroundColor: "white",
+  },
+  inputAndroid: {
+    fontSize: 16,
+    width: 150,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderColor: "gray",
+    borderRadius: 8,
+    color: "black",
+    paddingRight: 30,
+    backgroundColor: "white",
+  },
 });

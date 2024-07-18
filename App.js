@@ -6,7 +6,6 @@ import { TabNavigator } from "./components/navigators/TabNavigator";
 import { useFonts, Inter_900Black } from '@expo-google-fonts/inter';
 
 export default function App() {
-    // see /components/navigators
     let [fontsLoaded] = useFonts({
         Inter_900Black,
       });
@@ -23,11 +22,11 @@ export default function App() {
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#ccffcc",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-});
+// const styles = StyleSheet.create({
+//     container: {
+//         flex: 1,
+//         backgroundColor: "#ccffcc",
+//         alignItems: "center",
+//         justifyContent: "center",
+//     },
+// });
