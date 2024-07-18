@@ -6,18 +6,25 @@ import {
   Pressable,
   ActivityIndicator,
   ImageBackground,
+  Alert,
 } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import { useContext, useEffect, useState } from "react";
-import { UserContext } from "../../contexts/Contexts";
+import { UserContext, ErrContext } from "../../contexts/Contexts";
 import RNPickerSelect from "react-native-picker-select";
 import CollectedListCard from "./CollectedListCard";
 
 import { getCollectedPlantsList } from "../../api/apiFunctions";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import {
+  faRotateLeft,
+  faArrowUp,
+  faArrowDown,
+} from "@fortawesome/free-solid-svg-icons";
 const backgroundLeaf = require("../../assets/backgroundtest.jpg");
 
 export default function CollectedList({ navigation }) {
   const { user, setUser } = useContext(UserContext);
+  const { err, setErr } = useContext(ErrContext);
 
   const [isLoading, setIsLoading] = useState(true);
   const [plants, setPlants] = useState([]);
@@ -31,7 +38,7 @@ export default function CollectedList({ navigation }) {
   useEffect(() => {
     const fetchAllSpeciesFamilies = async () => {
       try {
-        const fetchedPlants = await getCollectedPlantsList(username, {});
+        const fetchedPlants = await getCollectedPlantsList(username, {}, setErr);
         const uniqueSpeciesFamilies = [
           ...new Set(fetchedPlants.map((plant) => plant.speciesFamily)),
         ];
@@ -39,7 +46,7 @@ export default function CollectedList({ navigation }) {
         setIsLoading(false);
       } catch (err) {
         setIsLoading(false);
-        console.error(err);
+        Alert.alert(`${(err.status, err.msg)}`, "Sorry, something went wrong");
       }
     };
     fetchAllSpeciesFamilies();
@@ -55,12 +62,12 @@ export default function CollectedList({ navigation }) {
           speciesFamily: selectedSpeciesFamily,
           sortBy,
           orderBy,
-        });
+        }, setErr);
         setPlants(fetchedPlants);
         setIsLoading(false);
-      } catch (err) {
+      } catch {
         setIsLoading(false);
-        console.error(err);
+        Alert.alert(`${(err.status, err.msg)}`, "Sorry, something went wrong");
       }
     };
     fetchPlants();
@@ -80,26 +87,26 @@ export default function CollectedList({ navigation }) {
         resizeMode="cover"
       >
         <View style={styles.overlay} />
-        <View style={styles.activity_indicator_background}>
+        <View style={styles.activityIndicatorBackground}>
           <ActivityIndicator size="large" color="#006400" />
-          <Text>Fetching plants...</Text>
+          <Text style={styles.loadingText}>Loading plants...</Text>
         </View>
       </ImageBackground>
     );
   }
 
   return (
-    <ImageBackground
-      source={backgroundLeaf}
-      style={styles.background}
-      resizeMode="repeat"
-    >
-      <View style={styles.overlay}></View>
-      <View style={styles.container}>
-        <ScrollView style={styles.scrollView}>
-          <View style={styles.query_container}>
-            <View style={styles.query_row}>
-              <View style={styles.query_button_container}>
+    <ScrollView style={styles.scrollView}>
+      <ImageBackground
+        source={backgroundLeaf}
+        style={styles.background}
+        resizeMode="repeat"
+      >
+        <View style={styles.overlay}></View>
+        <View style={styles.container}>
+          <View style={styles.queryContainer}>
+            <View style={styles.queryRow}>
+              <View style={styles.queryButtonContainer}>
                 <RNPickerSelect
                   onValueChange={(value) => setSelectedSpeciesFamily(value)}
                   items={speciesFamilies.map((family) => ({
@@ -108,9 +115,9 @@ export default function CollectedList({ navigation }) {
                   }))}
                   placeholder={{ label: "Family", value: null }}
                   style={pickerSelectStyles}
-                ></RNPickerSelect>
+                />
               </View>
-              <View style={styles.query_button_container}>
+              <View style={styles.queryButtonContainer}>
                 <RNPickerSelect
                   onValueChange={(value) => setSortBy(value)}
                   items={[
@@ -120,25 +127,25 @@ export default function CollectedList({ navigation }) {
                   ]}
                   placeholder={{ label: "Sort", value: null }}
                   style={pickerSelectStyles}
-                ></RNPickerSelect>
+                />
               </View>
             </View>
 
-            <View style={styles.query_button_container}>
+            <View style={styles.queryButtonContainer}>
               <Pressable
-                style={styles.icon_button}
+                style={styles.iconButton}
                 onPress={() => setOrderBy(orderBy === "ASC" ? "DESC" : "ASC")}
               >
-                <Ionicons
-                  name={orderBy === "DESC" ? "arrow-down" : "arrow-up"}
-                  size={24}
-                  color="white"
-                />
+                {orderBy === "ASC" ? (
+                  <FontAwesomeIcon icon={faArrowUp} color="white" />
+                ) : (
+                  <FontAwesomeIcon icon={faArrowDown} color="white" />
+                )}
               </Pressable>
             </View>
-            <View style={styles.query_button_container}>
-              <Pressable style={styles.reset_button} onPress={handleReset}>
-                <Text style={styles.button_text}>Reset</Text>
+            <View style={styles.queryButtonContainer}>
+              <Pressable style={styles.resetButton} onPress={handleReset}>
+                <FontAwesomeIcon icon={faRotateLeft} color="white" />
               </Pressable>
             </View>
           </View>
@@ -156,11 +163,12 @@ export default function CollectedList({ navigation }) {
               <CollectedListCard plant={plant} />
             </Pressable>
           ))}
-        </ScrollView>
-      </View>
-    </ImageBackground>
+        </View>
+      </ImageBackground>
+    </ScrollView>
   );
 }
+
 const styles = StyleSheet.create({
   imageBackground: {
     flex: 1,
@@ -171,17 +179,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   overlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
-  activity_indicator_background: {
+  activityIndicatorBackground: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 10,
+    color: "white",
+    fontSize: 16,
   },
   container: {
     flex: 1,
@@ -190,32 +199,36 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  query_container: {
+  queryContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 10,
   },
-  query_button_container: {
+  queryRow: {
+    flexDirection: "row",
+    flex: 3,
+  },
+  queryButtonContainer: {
     flex: 1,
     margin: 5,
   },
-  icon_button: {
-    marginTop: 20,
+  iconButton: {
+    marginTop: 30,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+    padding: 10,
     backgroundColor: "#006400",
     borderRadius: 5,
   },
-  reset_button: {
-    marginTop: 20,
+  resetButton: {
+    marginTop: 30,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+    padding: 10,
     backgroundColor: "#8B0000",
     borderRadius: 5,
   },
-  button_text: {
+  buttonText: {
     color: "white",
     fontWeight: "bold",
   },
@@ -242,7 +255,7 @@ const pickerSelectStyles = StyleSheet.create({
     borderColor: "gray",
     borderRadius: 4,
     color: "black",
-    paddingRight: 30, // to ensure the text is never behind the icon
+    paddingRight: 30,
     backgroundColor: "white",
   },
   inputAndroid: {
@@ -251,10 +264,10 @@ const pickerSelectStyles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderWidth: 0.5,
-    borderColor: "purple",
+    borderColor: "gray",
     borderRadius: 8,
     color: "black",
-    paddingRight: 30, // to ensure the text is never behind the icon
+    paddingRight: 30,
     backgroundColor: "white",
   },
 });
