@@ -6,6 +6,7 @@ import {
   Image,
   ScrollView,
   ImageBackground,
+  ActivityIndicator,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 

@@ -8,7 +8,6 @@ import {
   ImageBackground,
   Alert,
 } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import { useContext, useEffect, useState } from "react";
 import { UserContext, ErrContext } from "../../contexts/Contexts";
 import RNPickerSelect from "react-native-picker-select";
