@@ -2,8 +2,8 @@ import * as React from "react";
 import {
   TextInput,
   StyleSheet,
-  Platform,
   Pressable,
+  Platform,
   Text,
   View,
   Alert,
@@ -56,6 +56,7 @@ export default function Register({ navigation }) {
     handleSubmit,
     formState: { errors },
   } = useForm({
+    resolver: yupResolver(validationSchema),
     defaultValues: {
       emailAddress: "",
       password: "",
@@ -64,17 +65,18 @@ export default function Register({ navigation }) {
       lastName: "",
     },
   });
+
   const onSubmit = (data) => {
     setIsLoading(true);
     const newUser = {
       username: data.username,
-      name: data.firstName + " " + data.lastName,
+      name: `${data.firstName} ${data.lastName}`,
       email: data.emailAddress,
       password: data.password,
     };
     console.log(newUser, "posted user");
     postNewUser(newUser, setErr)
-      .then((user) => {
+      .then(() => {
         setIsLoading(false);
         Alert.alert("Registration complete!", "Please login to your account.", [
           {
@@ -126,98 +128,38 @@ export default function Register({ navigation }) {
           </View>
           <Text style={styles.heading}>Register</Text>
 
-          <Text style={styles.labelContainerText}>
-            Enter your email address:
-          </Text>
-          <Controller
-            control={control}
-            name="emailAddress"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                placeholder="Email Address"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                style={styles.textInput}
+          {[
+            { name: "emailAddress", label: "Enter your email address:" },
+            { name: "password", label: "Create a password:", secure: true },
+            { name: "username", label: "Enter a username:" },
+            { name: "firstName", label: "Enter your first name:" },
+            { name: "lastName", label: "Enter your last name:" },
+          ].map(({ name, label, secure }) => (
+            <View key={name} style={styles.inputContainer}>
+              <Text style={styles.labelContainerText}>{label}</Text>
+              <Controller
+                control={control}
+                name={name}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <View>
+                    <TextInput
+                      secureTextEntry={secure}
+                      placeholder={label}
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      style={styles.textInput}
+                    />
+                    {errors[name] && (
+                      <Text style={styles.errorText}>
+                        {errors[name].message}
+                      </Text>
+                    )}
+                  </View>
+                )}
               />
-            )}
-          />
-          {errors.emailAddress && (
-            <Text style={styles.errorText}>{errors.emailAddress.message}</Text>
-          )}
-
-          <Text style={styles.labelContainerText}>Create a password:</Text>
-          <Controller
-            control={control}
-            name="password"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                secureTextEntry={true}
-                placeholder="Password"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                style={styles.textInput}
-              />
-            )}
-          />
-          {errors.password && (
-            <Text style={styles.errorText}>{errors.password.message}</Text>
-          )}
-
-          <Text style={styles.labelContainerText}>Enter a username:</Text>
-          <Controller
-            control={control}
-            name="username"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                placeholder="Username"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                style={styles.textInput}
-              />
-            )}
-          />
-          {errors.username && (
-            <Text style={styles.errorText}>{errors.username.message}</Text>
-          )}
-
-          <Text style={styles.labelContainerText}>Enter your first name:</Text>
-          <Controller
-            control={control}
-            name="firstName"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                placeholder="First Name"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                style={styles.textInput}
-              />
-            )}
-          />
-          {errors.firstName && (
-            <Text style={styles.errorText}>{errors.firstName.message}</Text>
-          )}
-
-          <Text style={styles.labelContainerText}>Enter your last name:</Text>
-          <Controller
-            control={control}
-            name="lastName"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                placeholder="Last Name"
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                style={styles.textInput}
-              />
-            )}
-          />
-          {errors.lastName && (
-            <Text style={styles.errorText}>{errors.lastName.message}</Text>
-          )}
+            </View>
+          ))}
 
           <Pressable
             style={styles.button}
@@ -284,25 +226,31 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   labelContainerText: {
+    textAlign: "center",
     color: "white",
-    marginBottom: 5,
+  },
+  inputContainer: {
+    width: "100%",
+    maxWidth: 300,
+    marginBottom: 20,
   },
   textInput: {
     width: "100%",
-    maxWidth: 300,
     padding: Platform.OS === "ios" ? 15 : 10,
     backgroundColor: "white",
     borderRadius: 5,
-    marginBottom: 10,
+    marginTop: 10,
     fontSize: Platform.OS === "ios" ? 16 : 14,
   },
   errorText: {
     color: "red",
-    alignSelf: "flex-start",
-    marginBottom: 10,
+    fontSize: 12,
+    marginBottom: 20,
+    width: "100%",
+    textAlign: "left",
   },
   button: {
-    marginTop: 20,
+    margin: 20,
     backgroundColor: "green",
     padding: 15,
     borderRadius: 5,
