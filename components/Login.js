@@ -17,7 +17,7 @@ import { useForm, Controller } from "react-hook-form";
 import { ErrContext, UserContext } from "../contexts/Contexts";
 import { postLogin } from "../api/apiFunctions";
 const backgroundLeaf = require("../assets/backgroundtest.jpg");
-const logo = require("../assets/FloraFinderLogo.png");
+const logo = require("../assets/FloraFinderLogoEsther.png");
 
 export default function Login() {
   const { user, setUser } = useContext(UserContext);
@@ -45,6 +45,7 @@ export default function Login() {
     setIsLoading(true)
     const credentials = { username, password };
     postLogin(credentials, setErr)
+
       .then((user) => {
         setUser(user);
         setIsLoading(false);
@@ -174,16 +175,17 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   container: {
+    width: "100%",
+    paddingHorizontal: 20,
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
   },
   logoContainer: {
     marginBottom: 20,
   },
   logo: {
-    width: 100,
+    width: 200,
     height: 100,
     resizeMode: "contain",
   },
@@ -195,11 +197,11 @@ const styles = StyleSheet.create({
   },
   labelContainerText: {
     color: "white",
-    alignSelf: "flex-start",
     marginBottom: 5,
   },
   textInput: {
     width: "100%",
+    maxWidth: 300,
     padding: Platform.OS === "ios" ? 15 : 10,
     backgroundColor: "white",
     borderRadius: 5,

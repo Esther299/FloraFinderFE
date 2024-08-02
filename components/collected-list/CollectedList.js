@@ -38,7 +38,11 @@ export default function CollectedList({ navigation }) {
   useEffect(() => {
     const fetchAllSpeciesFamilies = async () => {
       try {
-        const fetchedPlants = await getCollectedPlantsList(username, {}, setErr);
+        const fetchedPlants = await getCollectedPlantsList(
+          username,
+          {},
+          setErr
+        );
         const uniqueSpeciesFamilies = [
           ...new Set(fetchedPlants.map((plant) => plant.speciesFamily)),
         ];
@@ -58,11 +62,15 @@ export default function CollectedList({ navigation }) {
     setIsLoading(true);
     const fetchPlants = async () => {
       try {
-        const fetchedPlants = await getCollectedPlantsList(username, {
-          speciesFamily: selectedSpeciesFamily,
-          sortBy,
-          orderBy,
-        }, setErr);
+        const fetchedPlants = await getCollectedPlantsList(
+          username,
+          {
+            speciesFamily: selectedSpeciesFamily,
+            sortBy,
+            orderBy,
+          },
+          setErr
+        );
         setPlants(fetchedPlants);
         setIsLoading(false);
       } catch {
@@ -96,13 +104,13 @@ export default function CollectedList({ navigation }) {
   }
 
   return (
-    <ScrollView style={styles.scrollView}>
-      <ImageBackground
-        source={backgroundLeaf}
-        style={styles.background}
-        resizeMode="repeat"
-      >
-        <View style={styles.overlay}></View>
+    <ImageBackground
+      source={backgroundLeaf}
+      style={styles.background}
+      resizeMode="cover"
+    >
+      <View style={styles.overlay}></View>
+      <ScrollView style={styles.scrollView}>
         <View style={styles.container}>
           <View style={styles.queryContainer}>
             <View style={styles.queryRow}>
@@ -130,7 +138,9 @@ export default function CollectedList({ navigation }) {
                 />
               </View>
             </View>
+          </View>
 
+          <View style={styles.buttonContainer}>
             <View style={styles.queryButtonContainer}>
               <Pressable
                 style={styles.iconButton}
@@ -149,6 +159,7 @@ export default function CollectedList({ navigation }) {
               </Pressable>
             </View>
           </View>
+
           {plants.map((plant, index) => (
             <Pressable
               key={index}
@@ -164,8 +175,8 @@ export default function CollectedList({ navigation }) {
             </Pressable>
           ))}
         </View>
-      </ImageBackground>
-    </ScrollView>
+      </ScrollView>
+    </ImageBackground>
   );
 }
 
@@ -200,33 +211,38 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   queryContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
     marginBottom: 10,
   },
   queryRow: {
     flexDirection: "row",
-    flex: 3,
+    justifyContent: "space-between",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
   },
   queryButtonContainer: {
-    flex: 1,
+    flex: 2,
     margin: 5,
   },
   iconButton: {
-    marginTop: 30,
+    marginLeft: 30,
     justifyContent: "center",
     alignItems: "center",
     padding: 10,
     backgroundColor: "#006400",
     borderRadius: 5,
+    width: "60%",
   },
   resetButton: {
-    marginTop: 30,
+    marginLeft: 20,
     justifyContent: "center",
     alignItems: "center",
     padding: 10,
     backgroundColor: "#8B0000",
     borderRadius: 5,
+    width: "60%",
   },
   buttonText: {
     color: "white",

@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faHome, faLeaf, faBars, faMapMarker, faCamera, faCircleDot, faUser } from '@fortawesome/free-solid-svg-icons';
-const logo = require("../assets/FloraFinderLogo.png");
+const logo = require("../assets/FloraFinderLogoEsther.png");
 
 const backgroundLeaf = require("../assets/backgroundtest.jpg");
 
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   logo: {
-    width: 100,
+    width: 200,
     height: 100,
     resizeMode: "contain",
   },
@@ -112,6 +112,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#006400",
     paddingVertical: Platform.OS === "ios" ? 12 : 10,
     paddingHorizontal: Platform.OS === "ios" ? 20 : 18,
+    width: 200,
+    height: 50,
     borderRadius: 5,
     marginVertical: 10,
     alignItems: "center",

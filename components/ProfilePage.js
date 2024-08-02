@@ -79,21 +79,22 @@ export default function ProfilePage() {
         resizeMode="cover"
       >
         <View style={styles.overlay} />
-        <View style={styles.activity_indicator_background}>
+        <View style={styles.activityIndicatorBackground}>
           <ActivityIndicator size="large" color="#006400" />
-          <Text>Loading...</Text>
+          <Text style={styles.loadingText}>Loading profile...</Text>
         </View>
       </ImageBackground>
     );
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-      <ImageBackground
-        source={backgroundLeaf}
-        style={styles.imageBackground}
-        resizeMode="cover"
-      >
+    <ImageBackground
+      source={backgroundLeaf}
+      style={styles.imageBackground}
+      resizeMode="cover"
+    >
+      <View style={styles.overlay} />
+      <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         <Text style={styles.heading}>My Profile</Text>
         {user ? (
           <View style={styles.profileCard}>
@@ -129,10 +130,10 @@ export default function ProfilePage() {
             </Pressable>
           </View>
         ) : (
-          <Text>Loading...</Text>
+          <Text style={styles.loadingText}>Loading...</Text>
         )}
-      </ImageBackground>
-    </ScrollView>
+      </ScrollView>
+    </ImageBackground>
   );
 }
 
@@ -144,15 +145,15 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0, 0, 0, 0.3)",
   },
-  activity_indicator_background: {
+  activityIndicatorBackground: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
   loadingText: {
     marginTop: 10,
-    fontSize: 18,
-    color: "#fff",
+    color: "white",
+    fontSize: 16,
   },
   scrollViewContainer: {
     flexGrow: 1,
@@ -168,7 +169,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   profileCard: {
-    width: "100%",
+    width: "70%",
     backgroundColor: "white",
     borderRadius: 10,
     padding: 20,

@@ -52,9 +52,9 @@ export default function LeagueTable() {
         resizeMode="cover"
       >
         <View style={styles.overlay} />
-        <View style={styles.loadingContainer}>
+        <View style={styles.activityIndicatorBackground}>
           <ActivityIndicator size="large" color="#006400" />
-          <Text>Loading table...</Text>
+          <Text style={styles.loadingText}>Loading table...</Text>
         </View>
       </ImageBackground>
     );
@@ -76,7 +76,7 @@ export default function LeagueTable() {
   }
 
   return (
-    <ScrollView style={styles.scrollView}>
+    
       <ImageBackground
         source={backgroundLeaf}
         style={styles.background}
@@ -86,7 +86,6 @@ export default function LeagueTable() {
         <View style={styles.container}>
           <Text style={styles.heading}>League Table</Text>
           <View style={styles.tableContainer}>
-            <View style={styles.table}>
               <View style={styles.tableHeader}>
                 {tableHead.map((header, index) => (
                   <View
@@ -97,7 +96,7 @@ export default function LeagueTable() {
                   </View>
                 ))}
               </View>
-              <ScrollView>
+              <ScrollView style={styles.scrollView}>
                 {users.map((user, index) => (
                   <Pressable
                     key={index}
@@ -113,9 +112,7 @@ export default function LeagueTable() {
               </ScrollView>
             </View>
           </View>
-        </View>
       </ImageBackground>
-    </ScrollView>
   );
 }
 
@@ -127,15 +124,15 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0, 0, 0, 0.3)",
   },
-  loadingContainer: {
+  activityIndicatorBackground: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
   loadingText: {
     marginTop: 10,
-    fontSize: 18,
-    color: "#fff",
+    color: "white",
+    fontSize: 16,
   },
   noDataText: {
     fontSize: 20,
@@ -162,9 +159,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     overflow: "hidden",
-  },
-  table: {
-    flex: 1,
   },
   tableHeader: {
     flexDirection: "row",

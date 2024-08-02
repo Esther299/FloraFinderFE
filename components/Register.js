@@ -20,7 +20,7 @@ import { ErrContext } from "../contexts/Contexts";
 import { postNewUser } from "../api/apiFunctions";
 
 const backgroundLeaf = require("../assets/backgroundtest.jpg");
-const logo = require("../assets/FloraFinderLogo.png");
+const logo = require("../assets/FloraFinderLogoEsther.png");
 
 const validationSchema = yup.object().shape({
   emailAddress: yup
@@ -111,7 +111,7 @@ export default function Register({ navigation }) {
 
   return (
     <ScrollView
-      contentContainerStyle={styles.background}
+      contentContainerStyle={styles.scrollViewContainer}
       showsVerticalScrollIndicator={false}
     >
       <ImageBackground
@@ -255,22 +255,24 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    width: "100%",
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   container: {
+    width: "100%",
+    paddingHorizontal: 20,
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
   },
   logoContainer: {
-    marginBottom: 20,
+    alignItems: "center",
   },
   logo: {
-    width: 100,
+    width: 200,
     height: 100,
     resizeMode: "contain",
   },
@@ -279,14 +281,15 @@ const styles = StyleSheet.create({
     color: "white",
     marginBottom: 20,
     fontWeight: Platform.OS === "ios" ? "600" : "bold",
+    textAlign: "center",
   },
   labelContainerText: {
     color: "white",
-    alignSelf: "flex-start",
     marginBottom: 5,
   },
   textInput: {
     width: "100%",
+    maxWidth: 300,
     padding: Platform.OS === "ios" ? 15 : 10,
     backgroundColor: "white",
     borderRadius: 5,

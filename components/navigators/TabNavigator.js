@@ -44,7 +44,9 @@ export function TabNavigator() {
           component={HomeStack}
           options={{
             tabBarLabel: "Home",
-            tabBarIcon: () => <FontAwesomeIcon icon={faHome} color={"green"} />,
+            tabBarIcon: ({ color }) => (
+              <FontAwesomeIcon icon={faHome} color={color} />
+            ),
           }}
         />
         <Tab.Screen
@@ -52,8 +54,8 @@ export function TabNavigator() {
           component={CollectNowStack}
           options={{
             tabBarLabel: "Collect Now",
-            tabBarIcon: () => (
-              <FontAwesomeIcon icon={faCamera} color={"green"} />
+            tabBarIcon: ({ color }) => (
+              <FontAwesomeIcon icon={faCamera} color={color} />
             ),
           }}
         />
@@ -62,7 +64,9 @@ export function TabNavigator() {
           component={CollectedListStack}
           options={{
             tabBarLabel: "Collection",
-            tabBarIcon: () => <FontAwesomeIcon icon={faLeaf} color={"green"} />,
+            tabBarIcon: ({ color }) => (
+              <FontAwesomeIcon icon={faLeaf} color={color} />
+            ),
           }}
         />
       </Tab.Navigator>

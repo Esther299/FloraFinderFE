@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 const backgroundLeaf = require('../assets/backgroundtest.jpg');
-const logo = require('../assets/FloraFinderLogo.png');
+const logo = require('../assets/FloraFinderLogoEsther.png');
 
 export default function LoginRegister({ navigation }) {
     return (
@@ -61,8 +61,8 @@ const styles = StyleSheet.create({
     marginBottom: 50,
   },
   logo: {
-    width: 150,
-    height: 150,
+    width: 300,
+    height: 100,
     resizeMode: "contain",
   },
   container: {
